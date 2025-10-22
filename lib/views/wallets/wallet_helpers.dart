@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:boder/models/riders_model.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 
 class WalletHelpers {
   static Future<bool?> showPaymentConfirmationDialog({

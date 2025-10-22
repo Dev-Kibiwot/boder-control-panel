@@ -1,7 +1,7 @@
 import 'package:boder/controller/wallets_controller.dart';
 import 'package:boder/models/wallet_model.dart';
 import 'package:boder/services/toast_service.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/space.dart';
 import 'package:boder/widgets/text.dart';
 import 'package:boder/widgets/text_form_field.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 
 class CustomAnnotatedSheet extends StatelessWidget {
   final Widget child;

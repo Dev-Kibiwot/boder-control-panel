@@ -1,11 +1,12 @@
 import 'package:boder/controller/side_nav_controller.dart';
 import 'package:boder/views/home/home_page.dart';
+import 'package:boder/views/report/reports_page.dart';
 import 'package:boder/views/riders/riders_page.dart';
 import 'package:boder/views/roles/roles_page.dart';
 import 'package:boder/views/trips/trips_page.dart';
 import 'package:boder/views/user/users_page.dart';
 import 'package:boder/views/wallets/wallets_page.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'side_nav.dart';
@@ -19,6 +20,7 @@ class MainLayout extends StatelessWidget {
     UsersPage(),
     TripsPage(),
     WalletsPage(),
+    ReportsPage(),
     RolesPage(),
   ];
 

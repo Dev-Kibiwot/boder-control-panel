@@ -1,7 +1,7 @@
 import 'package:boder/controller/wallets_controller.dart';
 import 'package:boder/models/wallet_model.dart';
 import 'package:boder/views/wallets/wallet_details_page.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/custom_header.dart';
 import 'package:boder/widgets/table/custom_data_table.dart';
 import 'package:boder/widgets/table/table_colunm.dart';

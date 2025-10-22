@@ -36,12 +36,17 @@ dependencies:
   cupertino_icons: ^1.0.8
   get: ^4.7.2
   window_manager: ^0.5.0
-  lottie: ^3.3.1
+  lottie: 
   fl_chart: ^1.0.0
   flutter_dotenv: ^5.2.1
   get_storage: ^2.1.1
   file_saver: ^0.3.1
   path_provider: ^2.1.5
+  pdf: ^3.11.3
+  intl: ^0.20.2
+  csv: ^6.0.0
+  excel: 
+  http: ^1.5.0
 
 dev_dependencies:
   flutter_test:

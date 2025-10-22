@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:boder/constants/layout/main_layout.dart';
 import 'package:boder/controller/users_controller.dart';
 import 'package:boder/views/auth/login_screen.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/custom_annotated_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

@@ -1,4 +1,4 @@
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/space.dart';
 import 'package:boder/widgets/spacing.dart';
 import 'package:boder/widgets/text.dart';
@@ -44,9 +44,14 @@ class SideNav extends StatelessWidget {
     ),
     const NavItem(
       index: 5,
+      icon: Icons.receipt_long,
+      label: 'Reports',
+    ),
+    const NavItem(
+      index: 6,
       icon: Icons.security,
       label: 'Roles',
-    ),
+    ),    
   ];
 
   @override

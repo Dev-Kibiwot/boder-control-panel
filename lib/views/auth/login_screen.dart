@@ -1,6 +1,6 @@
 import 'package:boder/constants/button.dart';
 import 'package:boder/controller/auth_controller.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/space.dart';
 import 'package:boder/widgets/spacing.dart';
 import 'package:boder/widgets/text.dart';

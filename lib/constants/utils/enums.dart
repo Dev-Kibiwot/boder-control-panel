@@ -54,3 +54,32 @@ enum RiderStatus {
   pending, 
   suspended 
 }
+
+enum ReportType { 
+  financial, 
+  trips, 
+  users, 
+  riders 
+}
+enum DateRangeType { 
+  today, 
+  yesterday, 
+  thisWeek, 
+  thisMonth, 
+  lastMonth, 
+  custom 
+}
+enum RecipientType { all, users, riders, specific }
+enum NotificationType {
+  general,
+  promotional,
+  alert,
+  update,
+  reminder,
+}
+
+enum NotificationStatus {
+  pending,
+  sent,
+  failed,
+}

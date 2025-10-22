@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 
 ThemeData appTheme = ThemeData(
   appBarTheme: AppBarTheme(

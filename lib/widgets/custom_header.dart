@@ -1,12 +1,14 @@
 import 'package:boder/controller/auth_controller.dart';
 import 'package:boder/controller/users_controller.dart';
-import 'package:boder/widgets/add_privilege_user%20_%20dialog.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
+import 'package:boder/views/notification/send_notification_dialog.dart';
 import 'package:boder/widgets/spacing.dart';
 import 'package:boder/widgets/text.dart';
 import 'package:boder/widgets/wallets_ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'add_privilege_user _ dialog.dart';
 
 class CustomHeader extends StatelessWidget {
   final user = Get.find<UsersController>();
@@ -151,9 +153,20 @@ class CustomHeader extends StatelessWidget {
                         ),
                         elevation: 8,
                         onSelected: (value) {
+                          if (value == 'send_notification') {
+                            Get.dialog(
+                              SendNotificationDialog(),
+                              barrierDismissible: false,
+                            );
+                          } else if (value == 'add_privileged') {
+                            AddPrivilegeUserDialog.show(context);
+                          } else if (value == 'logout') {
+                            auth.logout(context);
+                          }
                         },
                         itemBuilder: (context) => [
                           PopupMenuItem(
+                            value: 'profile',
                             child: Row(
                               children: [
                                 Icon(
@@ -171,6 +184,7 @@ class CustomHeader extends StatelessWidget {
                             ),
                           ),
                           PopupMenuItem(
+                            value: 'settings',
                             child: Row(
                               children: [
                                 Icon(
@@ -188,49 +202,61 @@ class CustomHeader extends StatelessWidget {
                             ),
                           ),
                           if (currentUser.userType == 0) ...[
-                          PopupMenuItem(
-                              child: GestureDetector(
-                                onTap: (){
-                                AddPrivilegeUserDialog.show(context);
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.security_sharp,
-                                      size: 18,
-                                      color: AppColors.textSecondary,
-                                    ),
-                                    CustomSpacing(width: 0.02),
-                                    CustomText(
-                                      "Add Privileged user", 
-                                      fontSize: 14,
-                                      textColor: AppColors.black,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                          PopupMenuItem(
-                            child: GestureDetector(
-                              onTap: (){
-                                auth.logout(context);
-                              },
+                            // Send Notification - NEW
+                            PopupMenuItem(
+                              value: 'send_notification',
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.logout_outlined,
+                                    Icons.notifications_active,
                                     size: 18,
                                     color: AppColors.textSecondary,
                                   ),
                                   CustomSpacing(width: 0.02),
                                   CustomText(
-                                    "Logout",
+                                    "Send Notification", 
                                     fontSize: 14,
                                     textColor: AppColors.black,
                                   ),
                                 ],
                               ),
+                            ),
+                            // Add Privileged User
+                            PopupMenuItem(
+                              value: 'add_privileged',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.security_sharp,
+                                    size: 18,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  CustomSpacing(width: 0.02),
+                                  CustomText(
+                                    "Add Privileged user", 
+                                    fontSize: 14,
+                                    textColor: AppColors.black,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                          PopupMenuItem(
+                            value: 'logout',
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.logout_outlined,
+                                  size: 18,
+                                  color: AppColors.textSecondary,
+                                ),
+                                CustomSpacing(width: 0.02),
+                                CustomText(
+                                  "Logout",
+                                  fontSize: 14,
+                                  textColor: AppColors.black,
+                                ),
+                              ],
                             ),
                           ),
                         ],

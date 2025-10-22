@@ -4,7 +4,7 @@ import 'package:boder/controller/wallets_controller.dart';
 import 'package:boder/widgets/charts/completed_vs_cancelled_chart.dart';
 import 'package:boder/widgets/charts/new_users_chart.dart';
 import 'package:boder/widgets/charts/traffic_pattern_chart.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/custom_header.dart';
 import 'package:boder/widgets/space.dart';
 import 'package:boder/widgets/spacing.dart';

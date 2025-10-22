@@ -1,6 +1,6 @@
 import 'package:boder/controller/privillage_user_controller.dart';
 import 'package:boder/models/privillage_user.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/custom_header.dart';
 import 'package:boder/widgets/table/custom_data_table.dart';
 import 'package:boder/widgets/table/table_colunm.dart';

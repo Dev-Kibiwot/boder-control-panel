@@ -1,5 +1,5 @@
 import 'package:boder/models/wallet_model.dart';
-import 'package:boder/widgets/colors.dart';
+import 'package:boder/constants/utils/colors.dart';
 import 'package:boder/widgets/space.dart';
 import 'package:boder/widgets/text.dart';
 import 'package:flutter/material.dart';
