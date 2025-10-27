@@ -1,5 +1,5 @@
 import 'package:boder/constants/utils/errors_widget.dart';
-import 'package:boder/services/api_config.dart';
+import 'package:boder/constants/api_config.dart';
 import 'package:boder/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';

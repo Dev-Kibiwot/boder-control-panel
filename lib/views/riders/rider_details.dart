@@ -108,6 +108,7 @@ class RiderDetailsDrawer extends StatelessWidget {
                     'Vehicle Information',
                     Icons.motorcycle,
                     [
+                      buildInfoRow('vehicle type', rider.vehicleCategory!),
                       buildInfoRow('Number Plate', rider.numberPlate),
                       buildInfoRow('Make', rider.bikeMake),
                       buildInfoRow('Model', rider.bikeModel),

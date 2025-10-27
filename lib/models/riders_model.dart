@@ -15,6 +15,7 @@ class Rider {
   final String bikeMake;
   final String bikeModel;
   final String bikeColor;
+  final String? vehicleCategory;
   final List<String> photosOfBike;
   final String idNumber;
   final String identificationType;
@@ -44,6 +45,7 @@ class Rider {
     required this.complitedTrips,
     required this.canciel,
     required this.rating,
+    required this.vehicleCategory,
     required this.gender,
     required this.dateOfBirth,
     this.image,
@@ -101,6 +103,7 @@ class Rider {
         'number_plate': numberPlate,
         'identification_type': identificationType,
         'photos_of_bike': photosOfBike,
+        'vehicleCategory': vehicleCategory
       },
       'verification': verification.toMap(),
       'stats': {
@@ -221,7 +224,8 @@ class Rider {
       balance: parseDouble(stats['balance'] ?? map['balance']),
       rating: parseDouble(stats['rating'] ?? map['rating']),
       complitedTrips: parseInt(stats['trips_completed']),
-      canciel: parseInt(stats['trips_cancelled']),
+      canciel: parseInt(stats['trips_cancelled']), 
+      vehicleCategory: parseString(vehicle['vehicleCategory']),
     );
 
     return rider;
@@ -238,6 +242,7 @@ class Rider {
     String? image,
     String? numberPlate,
     String? bikeMake,
+    String? vehicleCategory,
     String? bikeModel,
     String? bikeColor,
     double? balance,
@@ -282,6 +287,7 @@ class Rider {
       bikeColor: bikeColor ?? this.bikeColor,
       photosOfBike: photosOfBike ?? this.photosOfBike,
       idNumber: idNumber ?? this.idNumber,
+      vehicleCategory:vehicleCategory ?? this.vehicleCategory,
       identificationType: identificationType ?? this.identificationType,
       city: city ?? this.city,
       idPhoto: idPhoto ?? this.idPhoto,

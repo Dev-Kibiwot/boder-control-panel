@@ -142,50 +142,156 @@ class RidersPage extends StatelessWidget {
   }
 
   Widget buildFilterBar() {
-    return Obx(() => Row(
-      children: [
-        CustomText(
-          "Filter by approval:", 
-          fontSize: 14, 
-          textColor: AppColors.textSecondary
+  return Obx(() => Row(
+    children: [
+      // Approval Status Filter
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(8),
         ),
-        const SizedBox(width: 12),
-        Container(
-          height: 40,
-          width: 150,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightGrey),
-            borderRadius: BorderRadius.circular(8),
-            color: AppColors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<ApprovalFilter>(
-              value: ridersController.selectedFilter.value,
-              hint: CustomText(
-                "Select filter", 
-                fontSize: 14, 
-                textColor: AppColors.textSecondary
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.filter_list,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            CustomText(
+              "Status:", 
+              fontSize: 12, 
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.textSecondary
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 32,
+              constraints: const BoxConstraints(minWidth: 90),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(6),
+                color: AppColors.white,
               ),
-              isExpanded: true,
-              menuMaxHeight: 200,
-              items: ApprovalFilter.values.map((filter) => DropdownMenuItem<ApprovalFilter>(
-                value: filter,
-                child: Text(
-                  ridersController.getFiterText(filter), 
-                  style: const TextStyle(fontSize: 12)
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<ApprovalFilter>(
+                  value: ridersController.selectedFilter.value,
+                  isDense: true,
+                  menuMaxHeight: 200,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryBlue,
+                  ),
+                  items: ApprovalFilter.values.map((filter) {
+                    return DropdownMenuItem<ApprovalFilter>(
+                      value: filter,
+                      child: Text(
+                        ridersController.getFiterText(filter),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) ridersController.filterByApproval(value);
+                  },
+                  icon: const Icon(Icons.arrow_drop_down, size: 18),
                 ),
-              )).toList(),
-              onChanged: (value) {
-                if (value != null) ridersController.filterByApproval(value);
-              },
-              icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+              ),
+            ),
+          ],
+        ),
+      ),
+      
+      const SizedBox(width: 12),
+      
+      // Vehicle Type Filter
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.directions_bike,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            CustomText(
+              "Vehicle:", 
+              fontSize: 12, 
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.textSecondary
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 32,
+              constraints: const BoxConstraints(minWidth: 90),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(6),
+                color: AppColors.white,
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<VehecleType>(
+                  value: ridersController.selectedvehecle.value,
+                  isDense: true,
+                  menuMaxHeight: 200,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryBlue,
+                  ),
+                  items: VehecleType.values.map((filter) {
+                    return DropdownMenuItem<VehecleType>(
+                      value: filter,
+                      child: Text(
+                        ridersController.getFiterType(filter),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) ridersController.filterByType(value);
+                  },
+                  icon: const Icon(Icons.arrow_drop_down, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      
+      // Results Counter (Compact)
+      if (ridersController.selectedFilter.value != ApprovalFilter.all ||
+          ridersController.selectedvehecle.value != VehecleType.all)
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: CustomText(
+              '${ridersController.filteredRiders.length}',
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.blue,
             ),
           ),
         ),
-      ],
-    ));
-  }
+    ],
+  ));
+}
 
   buildTableColumns() {
     return [
@@ -274,6 +380,25 @@ class RidersPage extends StatelessWidget {
               fontWeight: FontWeight.w500, 
               color: AppColors.primaryBlue
             )
+          );
+        },
+      ),
+      TableColumn(
+        header: 'vehicle type',
+        key: 'vehicle',
+        flex: 2,
+        customWidget: (value, item) {
+          final rider = Rider.fromMap(item);
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            child: Text(
+              rider.vehicleCategory!, 
+              style: const TextStyle(
+                fontSize: 12, 
+                fontWeight: FontWeight.w500, 
+                color: AppColors.black
+              )
+            ),
           );
         },
       ),

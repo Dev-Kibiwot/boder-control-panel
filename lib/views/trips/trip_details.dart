@@ -204,6 +204,7 @@ class TripDetailsDrawer extends StatelessWidget {
           textColor: AppColors.primaryBlue,
         ),
         const SizedBox(height: 8),
+        buildInfoRow('Vehicle type', trip.rider.vehicleCategory!.isEmpty ? 'Not specified' : trip.rider.vehicleCategory!),
         buildInfoRow('Number Plate', trip.rider.numberPlate.isEmpty ? 'Not specified' : trip.rider.numberPlate),
         buildInfoRow('Make', trip.rider.bikeMake.isEmpty ? 'Not specified' : trip.rider.bikeMake),
         buildInfoRow('Model', trip.rider.bikeModel.isEmpty ? 'Not specified' : trip.rider.bikeModel),

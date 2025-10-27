@@ -153,72 +153,170 @@ class TripsPage extends StatelessWidget {
     );
   }
 
-  Widget buildFilterBar() {
-    return Obx(() => Row(
-      children: [
-       CustomText(
-          "Filter by status:", 
-          fontSize: 14, 
-          textColor: AppColors.textSecondary
+ Widget buildFilterBar() {
+  return Obx(() => Row(
+    children: [
+      // Status Filter
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(8),
         ),
-        const SizedBox(width: 12),
-        Container(
-          height: 40,
-          constraints: const BoxConstraints(
-            minWidth: 150,
-            maxWidth: 220, 
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightGrey),
-            borderRadius: BorderRadius.circular(8),
-            color: AppColors.white,
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<TripStatus>(
-              value: tripsController.selectedStatus.value,
-              hint: CustomText(
-                "Select status", 
-                fontSize: 14, 
-                textColor: AppColors.textSecondary
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.filter_list,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            CustomText(
+              "Status:", 
+              fontSize: 12, 
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.textSecondary
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 32,
+              constraints: const BoxConstraints(minWidth: 100),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(6),
+                color: AppColors.white,
               ),
-              isExpanded: true,
-              menuMaxHeight: 200,
-              items: TripStatus.values.map((status) => DropdownMenuItem<TripStatus>(
-                value: status,
-                child: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: tripsController.getStatusColor(status),
-                        borderRadius: BorderRadius.circular(6),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<TripStatus>(
+                  value: tripsController.selectedStatus.value,
+                  isDense: true,
+                  menuMaxHeight: 200,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryBlue,
+                  ),
+                  items: TripStatus.values.map((status) {
+                    return DropdownMenuItem<TripStatus>(
+                      value: status,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: tripsController.getStatusColor(status),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            tripsController.getStatusText(status),
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      tripsController.getStatusText(status), 
-                      style: const TextStyle(
-                        fontSize: 12
-                      )
-                    ),
-                  ],
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) tripsController.filterByStatus(value);
+                  },
+                  icon: const Icon(Icons.arrow_drop_down, size: 18),
                 ),
-              )).toList(),
-              onChanged: (value) {
-                if (value != null) tripsController.filterByStatus(value);
-              },
-              icon: const Icon(
-                Icons.keyboard_arrow_down, 
-                size: 16
               ),
+            ),
+          ],
+        ),
+      ),
+      
+      const SizedBox(width: 12),
+      
+      // Vehicle Type Filter
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.directions_bike,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+            const SizedBox(width: 6),
+            CustomText(
+              "Vehicle:", 
+              fontSize: 12, 
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.textSecondary
+            ),
+            const SizedBox(width: 8),
+            Container(
+              height: 32,
+              constraints: const BoxConstraints(minWidth: 90),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(6),
+                color: AppColors.white,
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<VehecleType>(
+                  value: tripsController.selectedVehicleType.value,
+                  isDense: true,
+                  menuMaxHeight: 200,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryBlue,
+                  ),
+                  items: VehecleType.values.map((type) {
+                    return DropdownMenuItem<VehecleType>(
+                      value: type,
+                      child: Text(
+                        tripsController.getVehicleTypeText(type),
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) tripsController.filterByVehicleType(value);
+                  },
+                  icon: const Icon(Icons.arrow_drop_down, size: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      
+      // Results Counter
+      if (tripsController.selectedStatus.value != TripStatus.all ||
+          tripsController.selectedVehicleType.value != VehecleType.all)
+        Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.blue.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: CustomText(
+              '${tripsController.filteredTrips.length}',
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              textColor: AppColors.blue,
             ),
           ),
         ),
-      ],
-    ));
-  }
+    ],
+  ));
+}
 
   buildTableColumns() {
   return [

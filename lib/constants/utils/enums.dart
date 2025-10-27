@@ -15,6 +15,11 @@ enum ApprovalFilter {
   approved, 
   pending 
 }
+enum VehecleType { 
+  all,
+  electric, 
+  petroleum 
+}
 
 
 enum TripStatus {

@@ -11,6 +11,7 @@ class TripsController extends GetxController {
   final RxList<Trip> filteredTrips = <Trip>[].obs;
   final RxString searchQuery = ''.obs;
   final Rx<TripStatus> selectedStatus = TripStatus.all.obs;
+  final Rx<VehecleType> selectedVehicleType = VehecleType.all.obs; // Add this
   final RxBool isLoading = false.obs;
   final Rxn<Trip> selectedTrips = Rxn<Trip>();
   final TripService tripService = TripService();
@@ -65,8 +66,16 @@ class TripsController extends GetxController {
     _applyFilters();
   }
 
+  // Add this method
+  void filterByVehicleType(VehecleType type) {
+    selectedVehicleType.value = type;
+    _applyFilters();
+  }
+
   void _applyFilters() {
     List<Trip> filtered = List.from(allTrips);
+    
+    // Filter by status
     if (selectedStatus.value != TripStatus.all) {
       switch (selectedStatus.value) {
         case TripStatus.completed:
@@ -85,6 +94,21 @@ class TripsController extends GetxController {
           filtered = filtered.where((trip) => trip.status == selectedStatus.value).toList();
       }
     }
+    
+    // Filter by vehicle type
+    if (selectedVehicleType.value != VehecleType.all) {
+      filtered = filtered.where((trip) {
+        final vehicleCategory = trip.rider.vehicleCategory?.toLowerCase();
+        if (selectedVehicleType.value == VehecleType.electric) {
+          return vehicleCategory == 'electric';
+        } else if (selectedVehicleType.value == VehecleType.petroleum) {
+          return vehicleCategory == 'petroleum';
+        }
+        return true;
+      }).toList();
+    }
+    
+    // Search filter
     if (searchQuery.value.isNotEmpty) {
       final query = searchQuery.value.toLowerCase();
       filtered = filtered.where((trip) {
@@ -97,6 +121,7 @@ class TripsController extends GetxController {
           trip.destinationLocation.toLowerCase().contains(query);
       }).toList();
     }
+    
     filteredTrips.assignAll(filtered);
   }
 
@@ -134,6 +159,18 @@ class TripsController extends GetxController {
         return Colors.red;
       case TripStatus.all:
         return Colors.blue;
+    }
+  }
+
+  // Add this method for vehicle type text
+  String getVehicleTypeText(VehecleType type) {
+    switch (type) {
+      case VehecleType.electric:
+        return 'Electric';
+      case VehecleType.petroleum:
+        return 'Petroleum';
+      case VehecleType.all:
+        return 'All';
     }
   }
 
