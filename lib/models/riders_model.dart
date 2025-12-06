@@ -15,7 +15,7 @@ class Rider {
   final String bikeMake;
   final String bikeModel;
   final String bikeColor;
-  final String? vehicleCategory;
+  final String vehicleCategory;
   final List<String> photosOfBike;
   final String idNumber;  
   final String identificationType;  
@@ -231,7 +231,7 @@ class Rider {
       rating: parseDouble(stats['rating'] ?? map['rating']),
       complitedTrips: parseInt(stats['trips_completed']),
       canciel: parseInt(stats['trips_cancelled']), 
-      vehicleCategory: parseNullableString(vehicle['vehicleCategory']),
+      vehicleCategory: parseString(vehicle['vehicleCategory']),
     );
 
     return rider;

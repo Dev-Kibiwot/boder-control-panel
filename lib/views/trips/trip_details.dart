@@ -145,8 +145,6 @@ class TripDetailsDrawer extends StatelessWidget {
         buildInfoRow('Full Name', trip.passenger.userName),
         buildInfoRow('Email', trip.passenger.email),
         buildInfoRow('Phone', trip.passenger.phone),
-        buildInfoRow('User Type', trip.passenger.userTypeDisplay),
-        buildBooleanRow('Email Confirmed', trip.passenger.emailConfirmed),
         if (trip.passenger.lastLogoutTime != null)
           buildInfoRow('Last Logout', 
             '${trip.passenger.lastLogoutTime!.day}/${trip.passenger.lastLogoutTime!.month}/${trip.passenger.lastLogoutTime!.year}'),
@@ -204,7 +202,7 @@ class TripDetailsDrawer extends StatelessWidget {
           textColor: AppColors.primaryBlue,
         ),
         const SizedBox(height: 8),
-        buildInfoRow('Vehicle type', trip.rider.vehicleCategory!.isEmpty ? 'Not specified' : trip.rider.vehicleCategory!),
+        buildInfoRow('Vehicle type', trip.rider.vehicleCategory ?? ""),
         buildInfoRow('Number Plate', trip.rider.numberPlate.isEmpty ? 'Not specified' : trip.rider.numberPlate),
         buildInfoRow('Make', trip.rider.bikeMake.isEmpty ? 'Not specified' : trip.rider.bikeMake),
         buildInfoRow('Model', trip.rider.bikeModel.isEmpty ? 'Not specified' : trip.rider.bikeModel),

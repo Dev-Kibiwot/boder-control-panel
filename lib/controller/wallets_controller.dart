@@ -6,7 +6,7 @@ import 'package:boder/controller/users_controller.dart';
 import 'package:boder/controller/payment_controller.dart';
 import 'package:boder/services/toast_service.dart';
 import 'package:boder/services/wallets_service.dart';
-import 'package:boder/constants/utils/enums.dart'; // Add this
+import 'package:boder/constants/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -33,9 +33,12 @@ class WalletsController extends GetxController {
   final RxDouble maxBalanceFilter = double.infinity.obs;
   final RxMap<String, dynamic> walletStats = <String, dynamic>{}.obs;
   
-  // NEW: Balance filter
+  // Balance filter
   final Rx<BalanceFilter> selectedBalanceFilter = BalanceFilter.all.obs;
   final Rx<BalanceSummary?> balanceSummary = Rx<BalanceSummary?>(null);
+  
+  // NEW: Transaction status filter
+  final RxString selectedTransactionStatus = 'All'.obs;
   
   // Getters
   int get totalWallets => enhancedStats['totalWallets'] ?? 0;
@@ -50,7 +53,6 @@ class WalletsController extends GetxController {
   int get successfulTransactionsCount => enhancedStats['successfulTransactions'] ?? 0;
   int get failedTransactionsCount => enhancedStats['failedTransactions'] ?? 0;
   
-  // NEW: Balance summary getters
   int get positiveWalletsCount => balanceSummary.value?.positiveWalletsCount ?? 0;
   int get negativeWalletsCount => balanceSummary.value?.negativeWalletsCount ?? 0;
   int get zeroBalanceCount => balanceSummary.value?.zeroBalanceCount ?? 0;
@@ -93,7 +95,7 @@ class WalletsController extends GetxController {
           return _enrichWalletWithData(wallet);
         }).toList();
         walletsResponse.value = response;
-        balanceSummary.value = response.data?.balanceSummary; // NEW: Store balance summary
+        balanceSummary.value = response.data?.balanceSummary;
         allWallets.assignAll(enrichedWallets);
         _applyFilters();
         _updateStats();
@@ -211,10 +213,15 @@ class WalletsController extends GetxController {
     selectedWallet.value = null;
   }
 
-  // NEW: Balance filter methods
   void filterByBalance(BalanceFilter filter) {
     selectedBalanceFilter.value = filter;
     fetchWallets(Get.context!, filter: filter);
+  }
+  
+  // NEW: Transaction status filter method
+  void filterByTransactionStatus(String status) {
+    selectedTransactionStatus.value = status;
+    _applyTransactionFilters();
   }
   
   String getBalanceFilterText(BalanceFilter filter) {
@@ -230,7 +237,6 @@ class WalletsController extends GetxController {
     }
   }
 
-  // DELEGATED TO PAYMENT CONTROLLER
   Future<void> payRider(BuildContext context, {
     required String riderId,
     required double amount,
@@ -252,7 +258,6 @@ class WalletsController extends GetxController {
     }
   }
 
-  // DELEGATED TO PAYMENT CONTROLLER
   Future<void> payAllDrivers(BuildContext context, {
     required List<String> riderIds, 
     String? description,
@@ -328,7 +333,9 @@ class WalletsController extends GetxController {
     minBalanceFilter.value = 0.0;
     maxBalanceFilter.value = double.infinity;
     selectedBalanceFilter.value = BalanceFilter.all;
+    selectedTransactionStatus.value = 'All'; // NEW: Reset transaction filter
     _applyFilters();
+    _applyTransactionFilters(); // NEW: Reapply transaction filters
     fetchWallets(Get.context!);
   }
 
@@ -376,7 +383,6 @@ class WalletsController extends GetxController {
     stats['averageBalance'] = allWallets.averageBalance;
     stats['successRate'] = allTransactions.successRate;
     
-    // NEW: Add balance summary to stats
     if (balanceSummary.value != null) {
       stats['positiveWalletsCount'] = balanceSummary.value!.positiveWalletsCount;
       stats['negativeWalletsCount'] = balanceSummary.value!.negativeWalletsCount;
@@ -442,8 +448,11 @@ class WalletsController extends GetxController {
     filteredWallets.assignAll(filtered);
   }
 
+  // UPDATED: Transaction filters with status filtering
   void _applyTransactionFilters() {
     List<WalletTransaction> filtered = List.from(allTransactions);
+    
+    // Apply search filter
     if (searchQuery.value.isNotEmpty) {
       filtered = filtered.where((transaction) {
         final driverName = transaction.driver?.fullnames.toLowerCase() ?? '';
@@ -457,6 +466,23 @@ class WalletsController extends GetxController {
                phone.contains(query);
       }).toList();
     }
+    
+    // NEW: Apply status filter
+    if (selectedTransactionStatus.value != 'All') {
+      filtered = filtered.where((transaction) {
+        switch (selectedTransactionStatus.value) {
+          case 'Successful':
+            return transaction.isSuccessful;
+          case 'Failed':
+            return transaction.isFailed;
+          case 'Pending':
+            return transaction.isPending;
+          default:
+            return true;
+        }
+      }).toList();
+    }
+    
     filteredTransactions.assignAll(filtered);
   }
 

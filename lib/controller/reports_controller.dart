@@ -4,6 +4,7 @@ import 'package:boder/controller/riders_controller.dart';
 import 'package:boder/controller/trip_controller.dart';
 import 'package:boder/controller/users_controller.dart';
 import 'package:boder/controller/wallets_controller.dart';
+import 'package:boder/models/wallet_model.dart';
 import 'package:boder/services/toast_service.dart';
 import 'package:boder/views/report/export_service.dart';
 import 'package:boder/views/report/report_detail_dialog.dart';
@@ -329,18 +330,46 @@ Future<void> exportReport(ReportItem report, BuildContext context, String format
     isExporting.value = false;
   }
 }
-
-// Financial Data Methods
+List<ReportItem> get walletReports {
+  return [
+    ReportItem(
+      name: 'Wallet Balance Analysis',
+      description: 'Distribution of positive, negative, and zero balances',
+      lastGenerated: DateTime.now().subtract(const Duration(hours: 1)),
+      type: ReportType.financial, // or create a new ReportType.wallets
+    ),
+    ReportItem(
+      name: 'Transaction Success Analysis',
+      description: 'Success, failure, and pending transaction breakdown',
+      lastGenerated: DateTime.now().subtract(const Duration(hours: 2)),
+      type: ReportType.financial,
+    ),
+    ReportItem(
+      name: 'Payout Requirements',
+      description: 'Riders with positive balances ready for payout',
+      lastGenerated: DateTime.now().subtract(const Duration(minutes: 30)),
+      type: ReportType.financial,
+    ),
+  ];
+}
 Map<String, dynamic> getFinancialData() {
   return {
     'totalRevenue': walletsController.totalBalance,
     'totalTransactions': walletsController.totalTransactionsCount,
     'successfulTransactions': walletsController.successfulTransactionsCount,
     'failedTransactions': walletsController.failedTransactionsCount,
+    'pendingTransactions': walletsController.allTransactions.pendingTransactions.length, 
     'successRate': walletsController.transactionSuccessRate,
     'averageTransactionValue': walletsController.totalTransactionsCount > 0
         ? walletsController.totalBalance / walletsController.totalTransactionsCount
         : 0.0,
+    'positiveWalletsCount': walletsController.positiveWalletsCount,
+    'negativeWalletsCount': walletsController.negativeWalletsCount,
+    'zeroBalanceCount': walletsController.zeroBalanceCount,
+    'positiveBalanceSum': walletsController.positiveBalanceSum,
+    'negativeBalanceSum': walletsController.negativeBalanceSum,
+    'totalWallets': walletsController.totalWallets,
+    'activeWallets': walletsController.activeWalletsCount,
   };
 }
 

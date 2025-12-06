@@ -88,28 +88,207 @@ class ReportDetailDialog extends StatelessWidget {
   }
 
   Widget _buildFinancialReport() {
-    final data = controller.getFinancialData();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildMetricsGrid([
-          _MetricData('Total Revenue', 'KES ${data['totalRevenue'].toStringAsFixed(2)}', Icons.attach_money, Colors.green),
-          _MetricData('Transactions', '${data['totalTransactions']}', Icons.receipt, Colors.blue),
-          _MetricData('Success Rate', '${data['successRate'].toStringAsFixed(1)}%', Icons.check_circle, Colors.green),
-          _MetricData('Failed', '${data['failedTransactions']}', Icons.error, Colors.red),
-        ]),
-        const SizedBox(height: 32),
-        _buildSectionTitle('Revenue Trend'),
-        const SizedBox(height: 16),
-        _buildRevenueChart(data),
-        const SizedBox(height: 32),
-        _buildSectionTitle('Transaction Distribution'),
-        const SizedBox(height: 16),
-        _buildTransactionPieChart(data),
-      ],
-    );
-  }
+  final data = controller.getFinancialData();
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildMetricsGrid([
+        _MetricData('Total Revenue', 'KES ${data['totalRevenue'].toStringAsFixed(2)}', Icons.attach_money, Colors.green),
+        _MetricData('Transactions', '${data['totalTransactions']}', Icons.receipt, Colors.blue),
+        _MetricData('Success Rate', '${data['successRate'].toStringAsFixed(1)}%', Icons.check_circle, Colors.green),
+        _MetricData('Pending', '${data['pendingTransactions']}', Icons.pending, Colors.orange), // NEW
+      ]),
+      const SizedBox(height: 32),
+      _buildSectionTitle('Revenue Trend'),
+      const SizedBox(height: 16),
+      _buildRevenueChart(data),
+      const SizedBox(height: 32),
+      _buildSectionTitle('Transaction Distribution'),
+      const SizedBox(height: 16),
+      _buildTransactionPieChart(data),
+      const SizedBox(height: 32),
+      // NEW: Balance distribution section
+      _buildSectionTitle('Wallet Balance Distribution'),
+      const SizedBox(height: 16),
+      _buildBalanceDistributionChart(data),
+      const SizedBox(height: 32),
+      _buildSectionTitle('Balance Summary'),
+      const SizedBox(height: 16),
+      _buildBalanceSummaryCards(data),
+    ],
+  );
+}
 
+// NEW: Balance distribution chart
+Widget _buildBalanceDistributionChart(Map<String, dynamic> data) {
+  final positive = data['positiveWalletsCount'] ?? 0;
+  final negative = data['negativeWalletsCount'] ?? 0;
+  final zero = data['zeroBalanceCount'] ?? 0;
+  
+  return SizedBox(
+    height: 200,
+    child: Row(
+      children: [
+        Expanded(
+          child: PieChart(
+            PieChartData(
+              sections: [
+                PieChartSectionData(
+                  value: positive.toDouble(),
+                  title: '$positive',
+                  color: Colors.green,
+                  radius: 80,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                PieChartSectionData(
+                  value: negative.toDouble(),
+                  title: '$negative',
+                  color: Colors.red,
+                  radius: 80,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                PieChartSectionData(
+                  value: zero.toDouble(),
+                  title: '$zero',
+                  color: Colors.grey,
+                  radius: 80,
+                  titleStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+              sectionsSpace: 2,
+              centerSpaceRadius: 40,
+            ),
+          ),
+        ),
+        const SizedBox(width: 24),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLegendItem('Positive Balance', Colors.green, positive),
+            const SizedBox(height: 8),
+            _buildLegendItem('Negative Balance', Colors.red, negative),
+            const SizedBox(height: 8),
+            _buildLegendItem('Zero Balance', Colors.grey, zero),
+          ],
+        ),
+      ],
+    ),
+  );
+}
+
+// NEW: Balance summary cards
+Widget _buildBalanceSummaryCards(Map<String, dynamic> data) {
+  return Row(
+    children: [
+      Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.green.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.arrow_upward, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Positive Balances',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A202C),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'KES ${data['positiveBalanceSum'].toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${data['positiveWalletsCount']} wallets',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF718096),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      const SizedBox(width: 16),
+      Expanded(
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.red.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red.withOpacity(0.3)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.arrow_downward, color: Colors.red, size: 20),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Negative Balances',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1A202C),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'KES ${data['negativeBalanceSum'].toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${data['negativeWalletsCount']} wallets',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF718096),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ],
+  );
+}
   Widget _buildTripsReport() {
     final data = controller.getTripData();
     return Column(
@@ -306,7 +485,7 @@ class ReportDetailDialog extends StatelessWidget {
   Widget _buildTransactionPieChart(Map<String, dynamic> data) {
     final successful = data['successfulTransactions'] ?? 0;
     final failed = data['failedTransactions'] ?? 0;
-    
+    final pending = data['pendingTransactions'] ?? 0;
     return SizedBox(
       height: 200,
       child: Row(
@@ -317,7 +496,7 @@ class ReportDetailDialog extends StatelessWidget {
                 sections: [
                   PieChartSectionData(
                     value: successful.toDouble(),
-                    title: '${successful}',
+                    title: '$successful',
                     color: Colors.green,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -328,7 +507,7 @@ class ReportDetailDialog extends StatelessWidget {
                   ),
                   PieChartSectionData(
                     value: failed.toDouble(),
-                    title: '${failed}',
+                    title: '$failed',
                     color: Colors.red,
                     radius: 80,
                     titleStyle: const TextStyle(
@@ -337,6 +516,19 @@ class ReportDetailDialog extends StatelessWidget {
                       color: Colors.white,
                     ),
                   ),
+                  // NEW: Pending section
+                  if (pending > 0)
+                    PieChartSectionData(
+                      value: pending.toDouble(),
+                      title: '$pending',
+                      color: Colors.orange,
+                      radius: 80,
+                      titleStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                 ],
                 sectionsSpace: 2,
                 centerSpaceRadius: 40,
@@ -351,6 +543,10 @@ class ReportDetailDialog extends StatelessWidget {
               _buildLegendItem('Successful', Colors.green, successful),
               const SizedBox(height: 8),
               _buildLegendItem('Failed', Colors.red, failed),
+              if (pending > 0) ...[
+                const SizedBox(height: 8),
+                _buildLegendItem('Pending', Colors.orange, pending), // NEW
+              ],
             ],
           ),
         ],

@@ -386,7 +386,7 @@ class WalletsPage extends StatelessWidget {
   }
 
   Widget _buildTransactionsFilterBar(WalletsController controller) {
-    return Row(
+    return Obx(() => Row(
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -417,7 +417,7 @@ class WalletsPage extends StatelessWidget {
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    value: 'All',
+                    value: controller.selectedTransactionStatus.value,
                     isDense: true,
                     menuMaxHeight: 200,
                     style: const TextStyle(
@@ -432,7 +432,9 @@ class WalletsPage extends StatelessWidget {
                         ))
                         .toList(),
                     onChanged: (value) {
-                      // TODO: Handle transaction filter change
+                      if (value != null) {
+                        controller.filterByTransactionStatus(value);
+                      }
                     },
                     icon: const Icon(Icons.arrow_drop_down, size: 18),
                   ),
@@ -441,9 +443,31 @@ class WalletsPage extends StatelessWidget {
             ],
           ),
         ),
-        
+        if (controller.selectedTransactionStatus.value != 'All')
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, size: 14, color: AppColors.blue),
+                  const SizedBox(width: 6),
+                  CustomText(
+                    '${controller.filteredTransactions.length} results',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    textColor: AppColors.blue,
+                  ),
+                ],
+              ),
+            ),
+          ),
         const Spacer(),
-        
         ElevatedButton.icon(
           onPressed: () => controller.fetchTransactions(Get.context!),
           icon: const Icon(Icons.refresh, size: 16),
@@ -456,7 +480,7 @@ class WalletsPage extends StatelessWidget {
           ),
         ),
       ],
-    );
+    ));
   }
 
   List<TableColumn> _buildWalletsTableColumns() {
