@@ -88,7 +88,7 @@ class HomePage extends StatelessWidget {
                             Expanded(
                               child: buildMetricCard(
                                 title: "Total Wages",
-                                value: wallets.totalBalance.toString(),
+                                value: wallets.totalPositiveBalances.toString(),
                                 subtitle: "+12.5%",
                                 color: AppColors.success,
                                 icon: Icons.account_balance_wallet,

@@ -18,10 +18,15 @@ class NotificationsController extends GetxController {
   final RxList<NotificationModel> notificationHistory = <NotificationModel>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isSending = false.obs;
+  final RxString userSearchQuery = ''.obs;
+  final RxString riderSearchQuery = ''.obs;
   
   // Form fields
   final titleController = TextEditingController();
   final messageController = TextEditingController();
+  final userSearchController = TextEditingController();
+  final riderSearchController = TextEditingController();
+  
   final Rx<NotificationType> selectedType = NotificationType.general.obs;
   final Rx<RecipientType> selectedRecipientType = RecipientType.all.obs;
   final RxList<String> selectedUserIds = <String>[].obs;
@@ -47,10 +52,50 @@ class NotificationsController extends GetxController {
     }
   }
 
+  // FIX: Properly typed filtered lists
+  List get filteredUsers {
+    final users = usersController.allUsers;
+    if (userSearchQuery.value.isEmpty) return users;
+    
+    return users.where((user) {
+      final query = userSearchQuery.value.toLowerCase();
+      return user.userName.toLowerCase().contains(query) ||
+             user.email.toLowerCase().contains(query) ||
+             user.phone.toLowerCase().contains(query);
+    }).toList();
+  }
+  
+  List get filteredRiders {
+    final riders = ridersController.filteredRiders;
+    if (riderSearchQuery.value.isEmpty) return riders;
+    
+    return riders.where((rider) {
+      final query = riderSearchQuery.value.toLowerCase();
+      return rider.fullnames.toLowerCase().contains(query) ||
+             rider.email.toLowerCase().contains(query) ||
+             rider.phone.toLowerCase().contains(query);
+    }).toList();
+  }
+
+  // Search methods
+  void searchUsers(String query) {
+    userSearchQuery.value = query;
+  }
+  
+  void searchRiders(String query) {
+    riderSearchQuery.value = query;
+  }
+
   void selectRecipientType(RecipientType type) {
     selectedRecipientType.value = type;
-    selectedUserIds.clear();
-    selectedRiderIds.clear();
+    if (type != RecipientType.specific) {
+      selectedUserIds.clear();
+      selectedRiderIds.clear();
+      userSearchQuery.value = '';
+      riderSearchQuery.value = '';
+      userSearchController.clear();
+      riderSearchController.clear();
+    }
   }
 
   void selectNotificationType(NotificationType type) {
@@ -63,6 +108,7 @@ class NotificationsController extends GetxController {
     } else {
       selectedUserIds.add(userId);
     }
+    selectedUserIds.refresh();
   }
 
   void toggleRiderSelection(String riderId) {
@@ -71,27 +117,41 @@ class NotificationsController extends GetxController {
     } else {
       selectedRiderIds.add(riderId);
     }
+    selectedRiderIds.refresh();
   }
 
+  // FIX: Don't use .toList() when adding to the list
   void selectAllUsers() {
     selectedUserIds.clear();
-    selectedUserIds.addAll(usersController.allUsers.map((u) => u.userId));
+    // Map returns an Iterable, which addAll accepts directly
+    selectedUserIds.addAll(
+      filteredUsers.map((u) => u.userId as String)
+    );
+    selectedUserIds.refresh();
   }
 
   void deselectAllUsers() {
     selectedUserIds.clear();
+    selectedUserIds.refresh();
   }
 
+  // FIX: Don't use .toList() when adding to the list
   void selectAllRiders() {
     selectedRiderIds.clear();
-    selectedRiderIds.addAll(ridersController.filteredRiders.map((r) => r.id));
+    // Map returns an Iterable, which addAll accepts directly
+    selectedRiderIds.addAll(
+      filteredRiders.map((r) => r.id as String)
+    );
+    selectedRiderIds.refresh();
   }
 
   void deselectAllRiders() {
     selectedRiderIds.clear();
+    selectedRiderIds.refresh();
   }
 
   Future<void> sendNotification(BuildContext context) async {
+    // Validation
     if (titleController.text.trim().isEmpty) {
       toastService.showError(
         context: context,
@@ -99,6 +159,7 @@ class NotificationsController extends GetxController {
       );
       return;
     }
+    
     if (messageController.text.trim().isEmpty) {
       toastService.showError(
         context: context,
@@ -106,6 +167,7 @@ class NotificationsController extends GetxController {
       );
       return;
     }
+    
     if (selectedRecipientType.value == RecipientType.specific) {
       if (selectedUserIds.isEmpty && selectedRiderIds.isEmpty) {
         toastService.showError(
@@ -115,10 +177,12 @@ class NotificationsController extends GetxController {
         return;
       }
     }
+
     try {
       isSending.value = true;
       bool success = false;
       int recipientCount = 0;
+
       switch (selectedRecipientType.value) {
         case RecipientType.all:
           success = await notificationService.sendToAllRegistered(
@@ -128,6 +192,7 @@ class NotificationsController extends GetxController {
           );
           recipientCount = usersController.totalUsers + ridersController.totalRiders;
           break;
+
         case RecipientType.users:
           success = await notificationService.sendToUsers(
             title: titleController.text.trim(),
@@ -149,22 +214,28 @@ class NotificationsController extends GetxController {
           break;
 
         case RecipientType.specific:
+          bool userSuccess = true;
+          bool riderSuccess = true;
+          
           if (selectedUserIds.isNotEmpty) {
-            success = await notificationService.sendToUsers(
+            userSuccess = await notificationService.sendToUsers(
               title: titleController.text.trim(),
               message: messageController.text.trim(),
               userIds: selectedUserIds.toList(),
               context: context,
             );
           }
+          
           if (selectedRiderIds.isNotEmpty) {
-            success = await notificationService.sendToRiders(
+            riderSuccess = await notificationService.sendToRiders(
               title: titleController.text.trim(),
               message: messageController.text.trim(),
               riderIds: selectedRiderIds.toList(),
               context: context,
             );
           }
+          
+          success = userSuccess && riderSuccess;
           recipientCount = selectedUserIds.length + selectedRiderIds.length;
           break;
       }
@@ -211,10 +282,14 @@ class NotificationsController extends GetxController {
   void clearForm() {
     titleController.clear();
     messageController.clear();
+    userSearchController.clear();
+    riderSearchController.clear();
     selectedType.value = NotificationType.general;
     selectedRecipientType.value = RecipientType.all;
     selectedUserIds.clear();
     selectedRiderIds.clear();
+    userSearchQuery.value = '';
+    riderSearchQuery.value = '';
   }
 
   String getRecipientTypeText(RecipientType type) {
@@ -247,6 +322,8 @@ class NotificationsController extends GetxController {
   void onClose() {
     titleController.dispose();
     messageController.dispose();
+    userSearchController.dispose();
+    riderSearchController.dispose();
     super.onClose();
   }
 }

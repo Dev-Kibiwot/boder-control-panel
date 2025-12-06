@@ -1,3 +1,4 @@
+import 'package:boder/constants/utils/enums.dart';
 import 'package:boder/controller/wallets_controller.dart';
 import 'package:boder/models/wallet_model.dart';
 import 'package:boder/views/wallets/wallet_details_page.dart';
@@ -12,12 +13,15 @@ import 'package:get/get.dart';
 
 class WalletsPage extends StatelessWidget {
   final WalletsController controller = Get.put(WalletsController());
+  
   WalletsPage({super.key});
+  
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.refreshAll(context);
     });    
+    
     return Scaffold(
       backgroundColor: AppColors.cardBackground,
       body: Obx(() {
@@ -61,7 +65,9 @@ class WalletsPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: TextField(
-                                onChanged: controller.selectedTabIndex.value == 0 ? controller.searchWallets : controller.searchTransacitons,
+                                onChanged: controller.selectedTabIndex.value == 0 
+                                    ? controller.searchWallets 
+                                    : controller.searchTransacitons,
                                 decoration: InputDecoration(
                                   hintText: controller.selectedTabIndex.value == 0 
                                       ? 'Search wallets by driver name or wallet ID...'
@@ -74,23 +80,14 @@ class WalletsPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 16),
-                          Container(
-                            height: 48,
-                            width: 48,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: IconButton(
-                              icon: Icon(Icons.download, color: Colors.grey.shade600),
-                              onPressed: () {
-                              },
-                              tooltip: 'Export',
-                            ),
-                          ),
+                          // REMOVED: Export icon
                         ],
                       ),
+                      const SizedBox(height: 16),
+                      // MOVED: Filter bar outside of table
+                      Obx(() => controller.selectedTabIndex.value == 0
+                          ? _buildWalletsFilterBar(controller)
+                          : _buildTransactionsFilterBar(controller)),
                     ],
                   ),
                 ),
@@ -137,6 +134,7 @@ class WalletsPage extends StatelessWidget {
       }),
     );
   }
+  
   Widget _buildStatsSection(WalletsController controller) {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -154,15 +152,6 @@ class WalletsPage extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             child: WalletUIUtils.buildStatCard(
-              'Total Balance', 
-              controller.formattedTotalBalance, 
-              Icons.monetization_on, 
-              AppColors.success
-            )
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: WalletUIUtils.buildStatCard(
               'Active Wallets', 
               controller.activeWalletsCount.toString(), 
               Icons.trending_up, 
@@ -171,17 +160,36 @@ class WalletsPage extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Expanded(
-            child:WalletUIUtils.buildStatCard(
+            child: WalletUIUtils.buildStatCard(
               'Transactions', 
               controller.totalTransactionsCount.toString(), 
               Icons.receipt_long, 
               AppColors.primaryBlue
             )
           ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: WalletUIUtils.buildStatCard(
+              'Positive Wallets', 
+              '${controller.positiveWalletsCount} (${controller.formattedPositiveBalance})', 
+              Icons.arrow_upward, 
+              AppColors.success
+            )
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: WalletUIUtils.buildStatCard(
+              'Negative Wallets', 
+              '${controller.negativeWalletsCount} (${controller.formattedNegativeBalance})', 
+              Icons.arrow_downward, 
+              AppColors.red
+            )
+          ),
         ],
       )),
     );
   }
+  
   Widget _buildWalletsTab(WalletsController controller) {
     return Obx(() => CustomDataTable<Map<String, dynamic>>(
       tag: 'wallets_table',
@@ -196,7 +204,7 @@ class WalletsPage extends StatelessWidget {
       onSearch: controller.searchWallets,
       showSearchBar: false,
       searchHint: 'Search wallets by driver name or wallet ID...',
-      actionBar: _buildWalletsFilterBar(controller),
+      // REMOVED: actionBar (moved outside)
       isLoading: controller.isLoading.value,
       noDataMessage: 'No wallets found',
     ));
@@ -214,47 +222,154 @@ class WalletsPage extends StatelessWidget {
         WalletUIUtils.showTransactionDetailsDialog(Get.context!, transaction);
       },
       showSearchBar: false,
-      actionBar: _buildTransactionsFilterBar(controller),
+      // REMOVED: actionBar (moved outside)
       isLoading: controller.isLoadingTransactions.value,
       noDataMessage: 'No transactions found',
     ));
   }
 
   Widget _buildWalletsFilterBar(WalletsController controller) {
-    return Obx(() => Row(
+    return Row(
       children: [
-        CustomText(
-          "Show:", 
-          fontSize: 14, 
-          textColor: AppColors.textSecondary
-        ),
-        const SizedBox(width: 12),
+        // Balance Filter Dropdown
         Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightGrey),
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(8),
-            color: AppColors.white,
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Checkbox(
-                value: controller.showOnlyActiveWallets.value,
-                onChanged: (_) => controller.toggleActiveWalletsOnly(),
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                activeColor: AppColors.blue,
-              ),
+              Icon(Icons.filter_list, size: 16, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
               CustomText(
-                "Active Only", 
+                "Balance:", 
                 fontSize: 12, 
+                fontWeight: FontWeight.w600, 
                 textColor: AppColors.textSecondary
+              ),
+              const SizedBox(width: 8),
+              Container(
+                height: 32,
+                constraints: const BoxConstraints(minWidth: 120),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                  borderRadius: BorderRadius.circular(6),
+                  color: AppColors.white,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<BalanceFilter>(
+                    value: controller.selectedBalanceFilter.value,
+                    isDense: true,
+                    menuMaxHeight: 200,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryBlue,
+                    ),
+                    items: BalanceFilter.values.map((filter) {
+                      return DropdownMenuItem<BalanceFilter>(
+                        value: filter,
+                        child: Text(
+                          controller.getBalanceFilterText(filter),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      if (value != null) {
+                        controller.filterByBalance(value);
+                      }
+                    },
+                    icon: const Icon(Icons.arrow_drop_down, size: 18),
+                  ),
+                ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
+        
+        // Active Only Checkbox
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.visibility, size: 16, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              CustomText(
+                "Show:", 
+                fontSize: 12, 
+                fontWeight: FontWeight.w600, 
+                textColor: AppColors.textSecondary
+              ),
+              const SizedBox(width: 8),
+              Container(
+                height: 32,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                  borderRadius: BorderRadius.circular(6),
+                  color: AppColors.white,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(
+                      value: controller.showOnlyActiveWallets.value,
+                      onChanged: (_) => controller.toggleActiveWalletsOnly(),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      activeColor: AppColors.blue,
+                    ),
+                    CustomText(
+                      "Active Only", 
+                      fontSize: 12, 
+                      textColor: AppColors.textSecondary
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        // Results Counter
+        if (controller.selectedBalanceFilter.value != BalanceFilter.all ||
+            controller.showOnlyActiveWallets.value)
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, size: 14, color: AppColors.blue),
+                  const SizedBox(width: 6),
+                  CustomText(
+                    '${controller.filteredWallets.length} results',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    textColor: AppColors.blue,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        
+        const Spacer(),
+        
+        // Refresh Button
         ElevatedButton.icon(
           onPressed: () => controller.refreshAll(Get.context!),
           icon: const Icon(Icons.refresh, size: 16),
@@ -267,50 +382,68 @@ class WalletsPage extends StatelessWidget {
           ),
         ),
       ],
-    ));
+    );
   }
 
   Widget _buildTransactionsFilterBar(WalletsController controller) {
     return Row(
       children: [
-        CustomText(
-          "Filter:", 
-          fontSize: 14, 
-          textColor: AppColors.textSecondary
-        ),
-        const SizedBox(width: 12),
         Container(
-          height: 40,
-          width: 120,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.lightGrey),
+            color: AppColors.cardBackground,
             borderRadius: BorderRadius.circular(8),
-            color: AppColors.white,
           ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              value: 'All',
-              hint: CustomText(
-                "All", 
-                fontSize: 14, 
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.filter_list, size: 16, color: AppColors.textSecondary),
+              const SizedBox(width: 6),
+              CustomText(
+                "Status:",
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
                 textColor: AppColors.textSecondary
               ),
-              isExpanded: true,
-              items: ['All', 'Successful', 'Failed', 'Pending']
-                  .map((filter) => DropdownMenuItem<String>(
-                    value: filter,
-                    child: Text(filter, style: const TextStyle(fontSize: 12)),
-                  ))
-                  .toList(),
-              onChanged: (value) {
-                // Handle transaction filter change
-              },
-              icon: const Icon(Icons.keyboard_arrow_down, size: 16),
-            ),
+              const SizedBox(width: 8),
+              Container(
+                height: 32,
+                constraints: const BoxConstraints(minWidth: 100),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.lightGrey.withOpacity(0.5)),
+                  borderRadius: BorderRadius.circular(6),
+                  color: AppColors.white,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: 'All',
+                    isDense: true,
+                    menuMaxHeight: 200,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryBlue,
+                    ),
+                    items: ['All', 'Successful', 'Failed', 'Pending']
+                        .map((filter) => DropdownMenuItem<String>(
+                          value: filter,
+                          child: Text(filter, style: const TextStyle(fontSize: 12)),
+                        ))
+                        .toList(),
+                    onChanged: (value) {
+                      // TODO: Handle transaction filter change
+                    },
+                    icon: const Icon(Icons.arrow_drop_down, size: 18),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-        const SizedBox(width: 16),
+        
+        const Spacer(),
+        
         ElevatedButton.icon(
           onPressed: () => controller.fetchTransactions(Get.context!),
           icon: const Icon(Icons.refresh, size: 16),
@@ -357,14 +490,16 @@ class WalletsPage extends StatelessWidget {
                     : WalletUIUtils.buildDefaultAvatar(driverName),
               ),
               const SizedBox(width: 12),
-              Text(
-                driverName, 
-                style: const TextStyle(
-                  fontSize: 14, 
-                  fontWeight: FontWeight.w600, 
-                  color: AppColors.primaryBlue
-                ), 
-                overflow: TextOverflow.ellipsis,
+              Expanded(
+                child: Text(
+                  driverName, 
+                  style: const TextStyle(
+                    fontSize: 14, 
+                    fontWeight: FontWeight.w600, 
+                    color: AppColors.primaryBlue
+                  ), 
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           );
@@ -377,7 +512,11 @@ class WalletsPage extends StatelessWidget {
         customWidget: (value, item) {
           final wallet = Wallet.fromJson(item);
           final balance = wallet.balance ?? 0.0;
-          final color = balance > 0 ? AppColors.success : AppColors.textSecondary;
+          final color = balance > 0 
+              ? AppColors.success 
+              : balance < 0 
+                  ? AppColors.red 
+                  : AppColors.textSecondary;
           
           return Text(
             wallet.formattedBalance,

@@ -1,5 +1,6 @@
 import 'package:boder/models/wallet_model.dart';
 import 'package:boder/constants/api_config.dart';
+import 'package:boder/constants/utils/enums.dart'; // Add this
 import 'package:boder/services/toast_service.dart';
 import 'package:boder/constants/utils/errors_widget.dart';
 import 'package:flutter/material.dart';
@@ -12,16 +13,24 @@ class WalletsService extends GetConnect {
   Wallets? walletsResponse;
   List<WalletTransaction> transactions = [];
 
-  Future<Wallets?> getWallets(BuildContext context) async {
+  Future<Wallets?> getWallets(BuildContext context, {BalanceFilter? balanceFilter}) async {
     final token = storage.read('token');
     try {
+      // Build query parameters
+      String url = ApiConfig.wallets;
+      if (balanceFilter != null && balanceFilter != BalanceFilter.all) {
+        final filterParam = _getBalanceFilterParam(balanceFilter);
+        url = '$url?balanceFilter=$filterParam';
+      }
+      
       final response = await get(
-        ApiConfig.wallets,
+        url,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
+      
       if (response.statusCode == 200) {
         if (response.body != null) {
           walletsResponse = Wallets.fromJson(response.body);
@@ -44,6 +53,20 @@ class WalletsService extends GetConnect {
         message: "Network error: ${e.toString()}"
       );
       return null;
+    }
+  }
+
+  String _getBalanceFilterParam(BalanceFilter filter) {
+    switch (filter) {
+      case BalanceFilter.positive:
+        return 'positive';
+      case BalanceFilter.negative:
+        return 'negative';
+      case BalanceFilter.zero:
+        return 'zero';
+      case BalanceFilter.all:
+      default:
+        return 'all';
     }
   }
 
@@ -90,6 +113,7 @@ class WalletsService extends GetConnect {
     }
   }
   
+  // Rest of the methods remain the same...
   Future<Map<String, dynamic>?> payRiders(BuildContext context, {
     String? riderId,
     double? amount,

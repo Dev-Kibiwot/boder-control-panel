@@ -54,4 +54,7 @@ class ApiConfig {
   static String get sendToSpecificRider => '$baseUrl/admin/send-to-rider';
   static String get notificationHistory => '$baseUrl/admin/notifications/history';
   static String notificationById(String id) => '$baseUrl/admin/notifications/$id';
+
+  //payout
+  static String batchPayout = '$baseUrl/payout/batch';
 }

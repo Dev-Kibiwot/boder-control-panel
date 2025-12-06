@@ -65,7 +65,7 @@ class CustomDataTable<T extends Map<String, dynamic>> extends StatelessWidget {
         children: [
           if (showSearch)
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Container(
                 height: 45,
                 decoration: BoxDecoration(

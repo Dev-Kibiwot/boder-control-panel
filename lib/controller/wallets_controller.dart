@@ -3,17 +3,20 @@ import 'package:boder/models/riders_model.dart';
 import 'package:boder/models/users_model.dart';
 import 'package:boder/controller/riders_controller.dart';
 import 'package:boder/controller/users_controller.dart';
+import 'package:boder/controller/payment_controller.dart';
 import 'package:boder/services/toast_service.dart';
 import 'package:boder/services/wallets_service.dart';
-import 'package:boder/views/wallets/wallet_helpers.dart';
+import 'package:boder/constants/utils/enums.dart'; // Add this
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class WalletsController extends GetxController {
   ToastService toastService = ToastService();
   final WalletsService walletsService = WalletsService();
+  final PaymentController paymentController = Get.put(PaymentController());
   final ridersController = Get.find<RidersController>();
-  final usersController = Get.find<UsersController>();
+  final usersController = Get.find<UsersController>();  
+  
   final RxInt selectedTabIndex = 0.obs;
   final Rx<Wallets?> walletsResponse = Rx<Wallets?>(null);
   final RxList<Wallet> allWallets = <Wallet>[].obs;
@@ -29,18 +32,33 @@ class WalletsController extends GetxController {
   final RxDouble minBalanceFilter = 0.0.obs;
   final RxDouble maxBalanceFilter = double.infinity.obs;
   final RxMap<String, dynamic> walletStats = <String, dynamic>{}.obs;
+  
+  // NEW: Balance filter
+  final Rx<BalanceFilter> selectedBalanceFilter = BalanceFilter.all.obs;
+  final Rx<BalanceSummary?> balanceSummary = Rx<BalanceSummary?>(null);
+  
   // Getters
   int get totalWallets => enhancedStats['totalWallets'] ?? 0;
-  double get totalBalance => enhancedStats['totalBalance'] ?? 0.0;
+  double get totalBalance => balanceSummary.value?.totalBalance ?? enhancedStats['totalBalance'] ?? 0.0;
   int get activeWalletsCount => enhancedStats['activeWallets'] ?? 0;
   int get totalTransactionsCount => enhancedStats['totalTransactions'] ?? 0;
-  String get formattedTotalBalance => 'KES ${totalBalance.toStringAsFixed(2)}';
+  String get formattedTotalBalance => balanceSummary.value?.formattedTotalBalance ?? 'KES ${totalBalance.toStringAsFixed(2)}';
   int get totalRidersCount => ridersController.totalRiders;
   int get totalUsersCount => usersController.totalUsers;
   double get averageWalletBalance => enhancedStats['averageBalance'] ?? 0.0;
   double get transactionSuccessRate => enhancedStats['successRate'] ?? 0.0;
   int get successfulTransactionsCount => enhancedStats['successfulTransactions'] ?? 0;
   int get failedTransactionsCount => enhancedStats['failedTransactions'] ?? 0;
+  
+  // NEW: Balance summary getters
+  int get positiveWalletsCount => balanceSummary.value?.positiveWalletsCount ?? 0;
+  int get negativeWalletsCount => balanceSummary.value?.negativeWalletsCount ?? 0;
+  int get zeroBalanceCount => balanceSummary.value?.zeroBalanceCount ?? 0;
+  double get positiveBalanceSum => balanceSummary.value?.positiveBalanceSum ?? 0.0;
+  double get negativeBalanceSum => balanceSummary.value?.negativeBalanceSum ?? 0.0;
+  String get formattedPositiveBalance => balanceSummary.value?.formattedPositiveBalance ?? 'KES 0.00';
+  String get formattedNegativeBalance => balanceSummary.value?.formattedNegativeBalance ?? 'KES 0.00';
+  
   List<Wallet> get walletsWithPositiveBalance => allWallets.where((wallet) => (wallet.balance ?? 0.0) > 0).toList();
   double get totalPositiveBalances => walletsWithPositiveBalance.fold(0.0, (sum, wallet) => sum + (wallet.balance ?? 0.0));
   List<String> get activeWalletRiderIds => allWallets.where((wallet) => wallet.driverId != null && (wallet.balance ?? 0.0) > 0).map((wallet) => wallet.driverId!).toSet().toList();
@@ -66,21 +84,23 @@ class WalletsController extends GetxController {
     }
   }
 
-  Future<void> fetchWallets(BuildContext context) async {
+  Future<void> fetchWallets(BuildContext context, {BalanceFilter? filter}) async {
     try {
       isLoading.value = true;
-      final response = await walletsService.getWallets(context);
+      final response = await walletsService.getWallets(context, balanceFilter: filter);
       if (response != null && response.data?.wallets != null) {
         final enrichedWallets = response.data!.wallets!.map((wallet) {
           return _enrichWalletWithData(wallet);
         }).toList();
         walletsResponse.value = response;
+        balanceSummary.value = response.data?.balanceSummary; // NEW: Store balance summary
         allWallets.assignAll(enrichedWallets);
         _applyFilters();
         _updateStats();
       } else {
         allWallets.clear();
         filteredWallets.clear();
+        balanceSummary.value = null;
       }
     } catch (e) {
       toastService.showError(
@@ -191,6 +211,26 @@ class WalletsController extends GetxController {
     selectedWallet.value = null;
   }
 
+  // NEW: Balance filter methods
+  void filterByBalance(BalanceFilter filter) {
+    selectedBalanceFilter.value = filter;
+    fetchWallets(Get.context!, filter: filter);
+  }
+  
+  String getBalanceFilterText(BalanceFilter filter) {
+    switch (filter) {
+      case BalanceFilter.all:
+        return 'All Wallets';
+      case BalanceFilter.positive:
+        return 'Positive Balance';
+      case BalanceFilter.negative:
+        return 'Negative Balance';
+      case BalanceFilter.zero:
+        return 'Zero Balance';
+    }
+  }
+
+  // DELEGATED TO PAYMENT CONTROLLER
   Future<void> payRider(BuildContext context, {
     required String riderId,
     required double amount,
@@ -198,147 +238,59 @@ class WalletsController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
-      final result = await walletsService.payRiders(
+      final success = await paymentController.payRider(
         context,
         riderId: riderId,
         amount: amount,
         description: description,
       );
-      if (result != null) {
-        toastService.showSuccess(
-          context: context,
-          message: 'Payment successful!'
-        );
+      if (success) {
         await refreshAll(context);
       }
-    } catch (e) {
-      toastService.showError(
-        context: context,
-        message: 'Payment failed: ${e.toString()}'
-      );
     } finally {
       isLoading.value = false;
     }
   }
 
+  // DELEGATED TO PAYMENT CONTROLLER
   Future<void> payAllDrivers(BuildContext context, {
     required List<String> riderIds, 
     String? description,
   }) async {
     final Map<String, double> riderPayments = {};
-    double totalAmount = 0.0;
+    final Map<String, Rider?> ridersMap = {};
+    
     for (String riderId in riderIds) {
       final wallet = getWalletByDriverId(riderId);
+      final rider = getRiderById(riderId);
+      
       if (wallet != null && (wallet.balance ?? 0.0) > 0) {
-        final balance = wallet.balance!;
-        riderPayments[riderId] = balance;
-        totalAmount += balance;
+        riderPayments[riderId] = wallet.balance!;
+        ridersMap[riderId] = rider;
       }
     }
-    final ridersToPayIds = riderPayments.keys.toList();
-    if (ridersToPayIds.isEmpty) {
+    
+    if (riderPayments.isEmpty) {
       toastService.showError(
         context: context,
         message: 'No riders have positive balances to pay out.'
       );
       return;
     }
-    bool? shouldProceed = await WalletHelpers.showPaymentConfirmationDialog(
-      ridersToPayIds: ridersToPayIds,
-      riderPayments: riderPayments,
-      totalAmount: totalAmount,
-      description: description,
-      getRiderById: getRiderById,
-    );
-    if (shouldProceed != true) {
-      return;
-    }
+
     try {
       isLoading.value = true;
-      WalletHelpers.showProcessingDialog(ridersToPayIds.length);
-      int successCount = 0;
-      int failureCount = 0;
-      List<Map<String, dynamic>> paymentResults = [];
-      for (String riderId in ridersToPayIds) {
-        try {
-          final amount = riderPayments[riderId]!;
-          final rider = getRiderById(riderId);
-          final riderName = rider?.fullnames ?? 'Unknown Rider';
-          final result = await walletsService.payRiders(
-            context,
-            riderId: riderId,
-            amount: amount,
-            description: description ?? 'Wallet balance payout',
-          );
-          if (result != null) {
-            successCount++;
-            paymentResults.add({
-              'riderId': riderId,
-              'riderName': riderName,
-              'email': rider?.email ?? '',
-              'phone': rider?.phone ?? '',
-              'amount': amount,
-              'status': 'Success',
-              'timestamp': DateTime.now().toIso8601String(),
-              'transactionId': result.toString(),
-            });
-          } else {
-            failureCount++;
-            paymentResults.add({
-              'riderId': riderId,
-              'riderName': riderName,
-              'email': rider?.email ?? '',
-              'phone': rider?.phone ?? '',
-              'amount': amount,
-              'status': 'Failed',
-              'timestamp': DateTime.now().toIso8601String(),
-              'error': 'Payment processing failed',
-            });
-          }
-        } catch (e) {
-          failureCount++;
-          final rider = getRiderById(riderId);
-          final riderName = rider?.fullnames ?? 'Unknown Rider';
-          paymentResults.add({
-            'riderId': riderId,
-            'riderName': riderName,
-            'email': rider?.email ?? '',
-            'phone': rider?.phone ?? '',
-            'amount': riderPayments[riderId]!,
-            'status': 'Failed',
-            'timestamp': DateTime.now().toIso8601String(),
-            'error': e.toString(),
-          });
-          continue;
-        }
-      }
-      Get.back();
-      await WalletHelpers.generatePaymentReceipt(paymentResults, totalAmount, description);
-      if (successCount > 0 && failureCount == 0) {
-        toastService.showSuccess(
-          context: context,
-          message: 'Successfully paid out KES ${totalAmount.toStringAsFixed(2)} to $successCount riders! Receipt downloaded.'
-        );
-      } else if (successCount > 0 && failureCount > 0) {
-        toastService.showWarning(
-          context: context,
-          message: 'Partially successful: $successCount payments succeeded, $failureCount failed. Check receipt for details.'
-        );
-      } else {
-        toastService.showError(
-          context: context,
-          message: 'All payments failed. Check receipt for error details.'
-        );
-      }
-      await refreshAll(context);
-    } catch (e) {
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
-      toastService.showError(
-        context: context,
-        message: 'Payment failed: ${e.toString()}'
+      
+      final success = await paymentController.payAllDrivers(
+        context,
+        riderPayments: riderPayments,
+        ridersMap: ridersMap,
+        description: description,
       );
+      
+      if (success) {
+        await refreshAll(context);
+      }
     } finally {
       isLoading.value = false;
     }
@@ -375,7 +327,9 @@ class WalletsController extends GetxController {
     showOnlyActiveWallets.value = false;
     minBalanceFilter.value = 0.0;
     maxBalanceFilter.value = double.infinity;
+    selectedBalanceFilter.value = BalanceFilter.all;
     _applyFilters();
+    fetchWallets(Get.context!);
   }
 
   Wallet? getWalletByDriverId(String driverId) {
@@ -421,6 +375,16 @@ class WalletsController extends GetxController {
     stats['totalUsers'] = usersController.totalUsers;
     stats['averageBalance'] = allWallets.averageBalance;
     stats['successRate'] = allTransactions.successRate;
+    
+    // NEW: Add balance summary to stats
+    if (balanceSummary.value != null) {
+      stats['positiveWalletsCount'] = balanceSummary.value!.positiveWalletsCount;
+      stats['negativeWalletsCount'] = balanceSummary.value!.negativeWalletsCount;
+      stats['zeroBalanceCount'] = balanceSummary.value!.zeroBalanceCount;
+      stats['positiveBalanceSum'] = balanceSummary.value!.positiveBalanceSum;
+      stats['negativeBalanceSum'] = balanceSummary.value!.negativeBalanceSum;
+    }
+    
     return stats;
   }
   

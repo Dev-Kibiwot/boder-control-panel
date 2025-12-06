@@ -340,7 +340,7 @@ class WalletUIUtils {
           const SizedBox(height: 12),
           CustomText(
             value, 
-            fontSize: 24, 
+            fontSize: 18, 
             fontWeight: FontWeight.bold,
             textColor: AppColors.primaryBlue
           ),

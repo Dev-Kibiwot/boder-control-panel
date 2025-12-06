@@ -33,23 +33,29 @@ class Data {
     int? page;
     int? pageSize;
     int? totalPages;
+    BalanceSummary? balanceSummary; // NEW
     Filters? filters;
+    
     Data({
         this.wallets,
         this.totalCount,
         this.page,
         this.pageSize,
         this.totalPages,
+        this.balanceSummary, // NEW
         this.filters,
     });
+    
     factory Data.fromJson(Map<String, dynamic> json) => Data(
       wallets: json["wallets"] == null ? [] : List<Wallet>.from(json["wallets"]!.map((x) => Wallet.fromJson(x))),
       totalCount: json["totalCount"],
       page: json["page"],
       pageSize: json["pageSize"],
       totalPages: json["totalPages"],
+      balanceSummary: json["balance_summary"] == null ? null : BalanceSummary.fromJson(json["balance_summary"]), // NEW
       filters: json["filters"] == null ? null : Filters.fromJson(json["filters"]),
     );
+    
     factory Data.fromJsonWithData(
       Map<String, dynamic> json, 
       Map<String, Rider> ridersMap, 
@@ -62,16 +68,87 @@ class Data {
       page: json["page"],
       pageSize: json["pageSize"],
       totalPages: json["totalPages"],
+      balanceSummary: json["balance_summary"] == null ? null : BalanceSummary.fromJson(json["balance_summary"]), // NEW
       filters: json["filters"] == null ? null : Filters.fromJson(json["filters"]),
     );
+    
     Map<String, dynamic> toJson() => {
         "wallets": wallets == null ? [] : List<dynamic>.from(wallets!.map((x) => x.toJson())),
         "totalCount": totalCount,
         "page": page,
         "pageSize": pageSize,
         "totalPages": totalPages,
+        "balance_summary": balanceSummary?.toJson(), // NEW
         "filters": filters?.toJson(),
     };
+}
+
+// NEW: Balance Summary class
+class BalanceSummary {
+  double? totalBalance;
+  double? positiveBalanceSum;
+  double? negativeBalanceSum;
+  int? zeroBalanceCount;
+  int? positiveWalletsCount;
+  int? negativeWalletsCount;
+  
+  BalanceSummary({
+    this.totalBalance,
+    this.positiveBalanceSum,
+    this.negativeBalanceSum,
+    this.zeroBalanceCount,
+    this.positiveWalletsCount,
+    this.negativeWalletsCount,
+  });
+  
+  factory BalanceSummary.fromJson(Map<String, dynamic> json) => BalanceSummary(
+    totalBalance: _parseDouble(json["total_balance"]),
+    positiveBalanceSum: _parseDouble(json["positive_balance_sum"]),
+    negativeBalanceSum: _parseDouble(json["negative_balance_sum"]),
+    zeroBalanceCount: _parseInt(json["zero_balance_count"]),
+    positiveWalletsCount: _parseInt(json["positive_wallets_count"]),
+    negativeWalletsCount: _parseInt(json["negative_wallets_count"]),
+  );
+  
+  Map<String, dynamic> toJson() => {
+    "total_balance": totalBalance,
+    "positive_balance_sum": positiveBalanceSum,
+    "negative_balance_sum": negativeBalanceSum,
+    "zero_balance_count": zeroBalanceCount,
+    "positive_wallets_count": positiveWalletsCount,
+    "negative_wallets_count": negativeWalletsCount,
+  };
+  
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) {
+      final parsed = double.tryParse(value);
+      if (parsed != null) return parsed;
+      return 0.0;
+    }
+    return 0.0;
+  }
+  
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.round();
+    if (value is String) {
+      final parsed = int.tryParse(value);
+      if (parsed != null) return parsed;
+      return 0;
+    }
+    return 0;
+  }
+  
+  // Convenience getters
+  String get formattedTotalBalance => 'KES ${totalBalance?.toStringAsFixed(2) ?? '0.00'}';
+  String get formattedPositiveBalance => 'KES ${positiveBalanceSum?.toStringAsFixed(2) ?? '0.00'}';
+  String get formattedNegativeBalance => 'KES ${negativeBalanceSum?.toStringAsFixed(2) ?? '0.00'}';
+  
+  int get totalWalletsCount => (positiveWalletsCount ?? 0) + (negativeWalletsCount ?? 0) + (zeroBalanceCount ?? 0);
 }
 
 class Filters {
@@ -80,12 +157,15 @@ class Filters {
   dynamic createdAfter;
   dynamic createdBefore;
   dynamic searchTerm;
+  String? balanceFilter; // NEW: 'all', 'positive', 'negative', 'zero'
+  
   Filters({
       this.minBalance,
       this.maxBalance,
       this.createdAfter,
       this.createdBefore,
       this.searchTerm,
+      this.balanceFilter, // NEW
   });
   
   factory Filters.fromJson(Map<String, dynamic> json) => Filters(
@@ -94,6 +174,7 @@ class Filters {
       createdAfter: json["createdAfter"],
       createdBefore: json["createdBefore"],
       searchTerm: json["searchTerm"],
+      balanceFilter: json["balanceFilter"]?.toString(), // NEW
   );
   
   Map<String, dynamic> toJson() => {
@@ -102,6 +183,7 @@ class Filters {
     "createdAfter": createdAfter,
     "createdBefore": createdBefore,
     "searchTerm": searchTerm,
+    "balanceFilter": balanceFilter, // NEW
   };
 }
 

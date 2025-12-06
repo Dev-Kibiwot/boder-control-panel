@@ -17,8 +17,8 @@ class Rider {
   final String bikeColor;
   final String? vehicleCategory;
   final List<String> photosOfBike;
-  final String idNumber;
-  final String identificationType;
+  final String idNumber;  
+  final String identificationType;  
   final String city;
   final String? idPhoto;
   final String? driversLicensePhoto;
@@ -54,8 +54,8 @@ class Rider {
     required this.bikeModel,
     required this.bikeColor,
     required this.photosOfBike,
-    required this.idNumber,
-    required this.identificationType,
+    required this.idNumber,  
+    required this.identificationType, 
     required this.city,
     this.idPhoto,
     this.driversLicensePhoto,
@@ -138,6 +138,12 @@ class Rider {
       return value.toString().trim();
     }
 
+    String? parseNullableString(dynamic value) {
+      if (value == null) return null;
+      final stringValue = value.toString().trim();
+      return stringValue.isEmpty ? null : stringValue;
+    }
+
     List<String> parseStringList(dynamic value) {
       if (value is List) {
         return value.map((item) => item?.toString() ?? '').toList();
@@ -180,7 +186,7 @@ class Rider {
           parsedJoinedDate = DateTime.now();
         }
       } else if (dobString.contains('-')) {
-        // Handle the new format like "2003-02-28 00:00:00.000"
+        // Handle the new format like "2003-02-28 00:00:00.000" or "1990-01-01"
         final cleanedString = dobString.split(' ')[0]; // Get just the date part
         parsedJoinedDate = DateTime.tryParse(cleanedString) ?? DateTime.now();
       } else {
@@ -198,25 +204,25 @@ class Rider {
       phone: parseString(map['phone']),
       gender: parseString(map['gender']),
       dateOfBirth: parseString(map['date_of_birth']),
-      image: map['image']?.toString(),
+      image: parseNullableString(map['image']),
       numberPlate: parseString(vehicle['number_plate']),
       bikeMake: parseString(vehicle['bike_make']),
       bikeModel: parseString(vehicle['bike_model']),
       bikeColor: parseString(vehicle['bike_color']),
       photosOfBike: parseStringList(vehicle['photos_of_bike']),
-      identificationType: parseString(vehicle['identification_type']),
-      idNumber: parseString(map['id_number']),
+      identificationType: parseString(vehicle['identification_type']),  
+      idNumber: parseString(map['id_number']),  
       city: parseString(map['city']),
-      idPhoto: map['id_photo']?.toString(),
-      driversLicensePhoto: map['drivers_license_photo']?.toString(),
+      idPhoto: parseNullableString(map['id_photo']),
+      driversLicensePhoto: parseNullableString(map['drivers_license_photo']),
       previousDriverExperience: parseBool(map['previous_driver_experience']),
       consentBackgroundChecks: parseBool(map['consent_background_checks']),
-      referalCode: map['referal_code']?.toString(),
-      username: map['username']?.toString(),
+      referalCode: parseNullableString(map['referal_code']),
+      username: parseNullableString(map['username']),
       status: parseString(map['status']),
       isAvailable: parseBool(map['is_available']),
-      deviceInfo: map['device_info']?.toString(),
-      lastLogoutTime: map['last_logout_time']?.toString(),
+      deviceInfo: parseNullableString(map['device_info']),
+      lastLogoutTime: parseNullableString(map['last_logout_time']),
       location: Location.fromMap(locationData),
       complainsFiled: complainsData.map((c) => Complaint.fromMap(c is Map<String, dynamic> ? c : {})).toList(),
       verification: Verification.fromMap(verificationData),
@@ -225,7 +231,7 @@ class Rider {
       rating: parseDouble(stats['rating'] ?? map['rating']),
       complitedTrips: parseInt(stats['trips_completed']),
       canciel: parseInt(stats['trips_cancelled']), 
-      vehicleCategory: parseString(vehicle['vehicleCategory']),
+      vehicleCategory: parseNullableString(vehicle['vehicleCategory']),
     );
 
     return rider;
@@ -287,7 +293,7 @@ class Rider {
       bikeColor: bikeColor ?? this.bikeColor,
       photosOfBike: photosOfBike ?? this.photosOfBike,
       idNumber: idNumber ?? this.idNumber,
-      vehicleCategory:vehicleCategory ?? this.vehicleCategory,
+      vehicleCategory: vehicleCategory ?? this.vehicleCategory,
       identificationType: identificationType ?? this.identificationType,
       city: city ?? this.city,
       idPhoto: idPhoto ?? this.idPhoto,
@@ -409,19 +415,25 @@ class Complaint {
     return {
       'id': id,
       'complaintText': complaintText,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'status': status,
       'resolution': resolution,
     };
   }
   
   factory Complaint.fromMap(Map<String, dynamic> map) {
+    DateTime parseDateTime(dynamic value) {
+      if (value is DateTime) return value;
+      if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+      return DateTime.now();
+    }
+
     return Complaint(
-      id: map['id'] ?? '',
-      complaintText: map['complaintText'] ?? '',
-      createdAt: map['createdAt'] ?? DateTime.now(),
-      status: map['status'] ?? '',
-      resolution: map['resolution'],
+      id: map['id']?.toString() ?? '',
+      complaintText: map['complaintText']?.toString() ?? '',
+      createdAt: parseDateTime(map['createdAt']),
+      status: map['status']?.toString() ?? '',
+      resolution: map['resolution']?.toString(),
     );
   }
 }

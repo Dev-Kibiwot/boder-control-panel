@@ -7,9 +7,7 @@ import 'package:get/get.dart';
 
 class SendNotificationDialog extends StatelessWidget {
   SendNotificationDialog({super.key});
-
   final NotificationsController controller = Get.put(NotificationsController());
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -35,8 +33,6 @@ class SendNotificationDialog extends StatelessWidget {
               _buildRecipientTypeSelector(),
               const SizedBox(height: 16),
               Obx(() => _buildRecipientsList()),
-              const SizedBox(height: 24),
-              _buildRecipientSummary(),
               const SizedBox(height: 24),
               _buildActions(context),
             ],
@@ -338,151 +334,281 @@ class SendNotificationDialog extends StatelessWidget {
   }
 
   Widget _buildUsersList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Users',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF718096),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          const Text(
+            'Users',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF718096),
             ),
-            child: Obx(() {
-              final users = controller.usersController.allUsers;
-              if (users.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No users available',
-                    style: TextStyle(color: Color(0xFF718096)),
+          ),
+          const SizedBox(width: 8),
+          Obx(() {
+            final selectedCount = controller.selectedUserIds.length;
+            if (selectedCount > 0) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$selectedCount',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.blue,
                   ),
-                );
-              }
-              return ListView.builder(
-                itemCount: users.length,
-                itemBuilder: (context, index) {
-                  final user = users[index];
-                  final isSelected = controller.selectedUserIds.contains(user.userId);
-                  return CheckboxListTile(
-                    value: isSelected,
-                    onChanged: (value) => controller.toggleUserSelection(user.userId),
-                    title: Text(
-                      user.userName,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                    subtitle: Text(
-                      user.email,
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF718096)),
-                    ),
-                    dense: true,
-                    activeColor: AppColors.blue,
-                  );
-                },
+                ),
               );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRidersList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Riders',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF718096),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Obx(() {
-              final riders = controller.ridersController.filteredRiders;
-              if (riders.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No riders available',
-                    style: TextStyle(color: Color(0xFF718096)),
-                  ),
-                );
-              }
-              return ListView.builder(
-                itemCount: riders.length,
-                itemBuilder: (context, index) {
-                  final rider = riders[index];
-                  final isSelected = controller.selectedRiderIds.contains(rider.id);
-                  return CheckboxListTile(
-                    value: isSelected,
-                    onChanged: (value) => controller.toggleRiderSelection(rider.id),
-                    title: Text(
-                      rider.fullnames,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                    subtitle: Text(
-                      rider.email,
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF718096)),
-                    ),
-                    dense: true,
-                    activeColor: AppColors.blue,
-                  );
-                },
-              );
-            }),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecipientSummary() {
-    return Obx(() {
-      return Container(
-        padding: const EdgeInsets.all(16),
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
+      const SizedBox(height: 8),
+      // NEW: Search box for users
+      Container(
+        height: 32,
         decoration: BoxDecoration(
-          color: AppColors.blue.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.blue.withOpacity(0.3)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
-        child: Row(
-          children: [
-            Icon(
-              Icons.people,
-              color: AppColors.blue,
-              size: 20,
+        child: TextField(
+          controller: controller.userSearchController,
+          onChanged: controller.searchUsers,
+          decoration: InputDecoration(
+            hintText: 'Search users...',
+            hintStyle: const TextStyle(
+              color: Color(0xFFA0AEC0),
+              fontSize: 12,
             ),
-            const SizedBox(width: 12),
-            Text(
-              'This notification will be sent to ${controller.totalRecipients} recipient(s)',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.blue,
-              ),
+            prefixIcon: const Icon(
+              Icons.search,
+              size: 16,
+              color: Color(0xFF718096),
             ),
-          ],
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            isDense: true,
+          ),
+          style: const TextStyle(fontSize: 12),
         ),
-      );
-    });
-  }
+      ),
+      const SizedBox(height: 8),
+      Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Obx(() {
+            final users = controller.filteredUsers;
+            final selectedIds = controller.selectedUserIds.toList();
+            
+            if (users.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      controller.userSearchQuery.value.isNotEmpty
+                          ? Icons.search_off
+                          : Icons.people_outline,
+                      size: 32,
+                      color: const Color(0xFFCBD5E0),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      controller.userSearchQuery.value.isNotEmpty
+                          ? 'No users found'
+                          : 'No users available',
+                      style: const TextStyle(
+                        color: Color(0xFF718096),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) {
+                final user = users[index];
+                final isSelected = selectedIds.contains(user.userId);
+                
+                return CheckboxListTile(
+                  value: isSelected,
+                  onChanged: (value) {
+                    controller.toggleUserSelection(user.userId);
+                  },
+                  title: Text(
+                    user.userName,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  subtitle: Text(
+                    user.email,
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF718096)),
+                  ),
+                  dense: true,
+                  activeColor: AppColors.blue,
+                  checkColor: AppColors.white,
+                  controlAffinity: ListTileControlAffinity.leading,
+                );
+              },
+            );
+          }),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildRidersList() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          const Text(
+            'Riders',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF718096),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Obx(() {
+            final selectedCount = controller.selectedRiderIds.length;
+            if (selectedCount > 0) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '$selectedCount',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.blue,
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
+        ],
+      ),
+      const SizedBox(height: 8),
+      // NEW: Search box for riders
+      Container(
+        height: 32,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+        ),
+        child: TextField(
+          controller: controller.riderSearchController,
+          onChanged: controller.searchRiders,
+          decoration: InputDecoration(
+            hintText: 'Search riders...',
+            hintStyle: const TextStyle(
+              color: Color(0xFFA0AEC0),
+              fontSize: 12,
+            ),
+            prefixIcon: const Icon(
+              Icons.search,
+              size: 16,
+              color: Color(0xFF718096),
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            isDense: true,
+          ),
+          style: const TextStyle(fontSize: 12),
+        ),
+      ),
+      const SizedBox(height: 8),
+      Expanded(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Obx(() {
+            final riders = controller.filteredRiders;
+            final selectedIds = controller.selectedRiderIds.toList();
+            if (riders.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      controller.riderSearchQuery.value.isNotEmpty
+                          ? Icons.search_off
+                          : Icons.motorcycle_outlined,
+                      size: 32,
+                      color: const Color(0xFFCBD5E0),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      controller.riderSearchQuery.value.isNotEmpty
+                          ? 'No riders found'
+                          : 'No riders available',
+                      style: const TextStyle(
+                        color: Color(0xFF718096),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              itemCount: riders.length,
+              itemBuilder: (context, index) {
+                final rider = riders[index];
+                final isSelected = selectedIds.contains(rider.id);
+                
+                return CheckboxListTile(
+                  value: isSelected,
+                  onChanged: (value) {
+                    controller.toggleRiderSelection(rider.id);
+                  },
+                  title: Text(
+                    rider.fullnames,
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                  subtitle: Text(
+                    rider.email,
+                    style: const TextStyle(fontSize: 11, color: Color(0xFF718096)),
+                  ),
+                  dense: true,
+                  activeColor: AppColors.blue,
+                  checkColor: AppColors.white,
+                  controlAffinity: ListTileControlAffinity.leading,
+                );
+              },
+            );
+          }),
+        ),
+      ),
+    ],
+  );
+}
 
   Widget _buildActions(BuildContext context) {
     return Row(

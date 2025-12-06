@@ -29,7 +29,6 @@ class AddPrivilegeUserDialog {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Title with close button
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -66,7 +65,7 @@ class AddPrivilegeUserDialog {
                       }
                       return null;
                     },
-                    label: "Enter first name address",
+                    label: "Enter first name",
                   ),
                   const SizedBox(height: 20),
                   CustomTextFormField(
@@ -79,7 +78,7 @@ class AddPrivilegeUserDialog {
                       }
                       return null;
                     },
-                    label: "Enter last name address",
+                    label: "Enter last name",
                   ),
                   const SizedBox(height: 20),
                   CustomTextFormField(

@@ -14,8 +14,17 @@ class ToastService {
     ToastType type = ToastType.info,
     Duration duration = const Duration(seconds: 2),
   }) {
+    // Check if context is still valid
+    if (!context.mounted) {
+      print('⚠️ Toast skipped: Context is no longer mounted');
+      return;
+    }
+
     _removeCurrentToast();
-    final overlay = Overlay.of(context);
+    
+    // Safely get overlay
+    final overlay = Overlay.of(context, rootOverlay: true);
+    
     late OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
@@ -38,14 +47,26 @@ class ToastService {
   }
 
   void _removeCurrentToast() {
-    _currentOverlay?.remove();
-    _currentOverlay = null;
+    try {
+      _currentOverlay?.remove();
+      _currentOverlay = null;
+    } catch (e) {
+      print('⚠️ Error removing toast: $e');
+      _currentOverlay = null;
+    }
   }
 
   void _removeOverlayEntry(OverlayEntry entry) {
-    entry.remove();
-    if (_currentOverlay == entry) {
-      _currentOverlay = null;
+    try {
+      entry.remove();
+      if (_currentOverlay == entry) {
+        _currentOverlay = null;
+      }
+    } catch (e) {
+      print('⚠️ Error removing overlay entry: $e');
+      if (_currentOverlay == entry) {
+        _currentOverlay = null;
+      }
     }
   }
 
@@ -109,37 +130,3 @@ class ToastService {
     );
   }
 }
-
-// extension BuildContextToast on BuildContext {
-//   void showSuccessToast(String message, {String title = 'Success'}) {
-//     ToastService().showSuccess(
-//       context: this,
-//       message: message,
-//       title: title,
-//     );
-//   }
-
-//   void showErrorToast(String message, {String title = 'Error'}) {
-//     ToastService().showError(
-//       context: this,
-//       message: message,
-//       title: title,
-//     );
-//   }
-
-//   void showWarningToast(String message, {String title = 'Warning'}) {
-//     ToastService().showWarning(
-//       context: this,
-//       message: message,
-//       title: title,
-//     );
-//   }
-
-//   void showInfoToast(String message, {String title = 'Info'}) {
-//     ToastService().showInfo(
-//       context: this,
-//       message: message,
-//       title: title,
-//     );
-//   }
-// }

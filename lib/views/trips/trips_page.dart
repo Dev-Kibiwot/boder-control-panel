@@ -327,7 +327,7 @@ class TripsPage extends StatelessWidget {
       customWidget: (value, item) {
         final trip = Trip.fromMap(item);
         return CustomText(
-          trip.id.substring(0, 8) + '...', 
+          '${trip.id.substring(0, 8)}...', 
           fontSize: 12, 
           fontWeight: FontWeight.w600, 
           textColor: AppColors.textSecondary,

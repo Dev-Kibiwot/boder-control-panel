@@ -51,8 +51,6 @@ class RidersServices extends GetConnect {
       ApiConfig.approveRider(riderId),
       {
         "isAvailable": true,
-        "lat": 0.0, 
-        "lng": 0.0
       },
       headers: {
         'Authorization': 'Bearer $token',

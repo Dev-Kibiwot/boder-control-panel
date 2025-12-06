@@ -141,6 +141,7 @@ class UsersPage extends StatelessWidget {
       TableColumn(
         header: 'User',
         key: 'user',
+        flex: 2,
         customWidget: (value, item) {
           final user = Users.fromMap(item);
           return Row(
@@ -169,7 +170,7 @@ class UsersPage extends StatelessWidget {
                 child: Text(
                   user.userName,
                   style: const TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryBlue
                   ),
@@ -183,6 +184,7 @@ class UsersPage extends StatelessWidget {
       TableColumn(
         header: "Email",
         key: "email",
+        flex: 2,
         customWidget: (value, item) {
           final user = Users.fromMap(item);
           return CustomText(
@@ -202,26 +204,10 @@ class UsersPage extends StatelessWidget {
           return Text(
             user.phone,
             style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryBlue
-            ),
-          );
-        },
-      ),
-      TableColumn(
-        header: 'User Type',
-        key: 'userType',
-        customWidget: (value, item) {
-          final user = Users.fromMap(item);
-          return Text(
-            user.userTypeDisplay,
-            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: user.userType == 1 
-                  ? AppColors.blue
-                  : AppColors.textSecondary,
+              color: AppColors.primaryBlue,
+              overflow: TextOverflow.ellipsis,
             ),
           );
         },
@@ -299,7 +285,8 @@ class UsersPage extends StatelessWidget {
         flex: 1,
         customWidget: (value, item) {
           final user = Users.fromMap(item);
-          return Obx(() => IconButton(
+          return Obx(() => 
+          IconButton(
             onPressed: usersController.isDeleting.value ? null  : () => usersController.deleteUser(user, context),
             icon: Icon(
               Icons.delete,

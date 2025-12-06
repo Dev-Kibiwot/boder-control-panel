@@ -29,7 +29,12 @@ enum TripStatus {
   cancelled_by_user,
   rejected,
 }
-
+enum BalanceFilter {
+  all,
+  positive,
+  negative,
+  zero,
+}
 enum InternetConnectionState{
   connected,
   weakConnection,
