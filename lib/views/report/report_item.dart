@@ -1,4 +1,4 @@
-import 'package:boder/constants/utils/enums.dart';
+import 'package:devboder/constants/utils/enums.dart';
 
 class ReportItem {
   final String name;

@@ -1,12 +1,13 @@
-import 'package:boder/controller/side_nav_controller.dart';
-import 'package:boder/views/home/home_page.dart';
-import 'package:boder/views/report/reports_page.dart';
-import 'package:boder/views/riders/riders_page.dart';
-import 'package:boder/views/roles/roles_page.dart';
-import 'package:boder/views/trips/trips_page.dart';
-import 'package:boder/views/user/users_page.dart';
-import 'package:boder/views/wallets/wallets_page.dart';
-import 'package:boder/constants/utils/colors.dart';
+import 'package:devboder/controller/side_nav_controller.dart';
+import 'package:devboder/views/home/home_page.dart';
+import 'package:devboder/views/report/reports_page.dart';
+import 'package:devboder/views/riders/riders_page.dart';
+import 'package:devboder/views/roles/roles_page.dart';
+import 'package:devboder/views/trips/trips_page.dart';
+import 'package:devboder/views/user/users_page.dart';
+import 'package:devboder/views/wallets/wallets_page.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/controller/side_nav_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'side_nav.dart';
@@ -23,7 +24,6 @@ class MainLayout extends StatelessWidget {
     ReportsPage(),
     RolesPage(),
   ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

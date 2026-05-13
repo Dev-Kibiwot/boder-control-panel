@@ -1,10 +1,10 @@
-import 'package:boder/constants/button.dart';
-import 'package:boder/controller/auth_controller.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/spacing.dart';
-import 'package:boder/widgets/text.dart';
-import 'package:boder/widgets/text_form_field.dart';
+import 'package:devboder/constants/button.dart';
+import 'package:devboder/controller/auth_controller.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/spacing.dart';
+import 'package:devboder/widgets/text.dart';
+import 'package:devboder/widgets/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';

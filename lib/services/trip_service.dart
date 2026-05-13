@@ -1,7 +1,7 @@
-import 'package:boder/constants/utils/errors_widget.dart';
-import 'package:boder/constants/api_config.dart';
-import 'package:boder/models/trip_model.dart';
-import 'package:boder/services/toast_service.dart';
+import 'package:devboder/constants/utils/errors_widget.dart';
+import 'package:devboder/constants/api_config.dart';
+import 'package:devboder/models/trip_model.dart';
+import 'package:devboder/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
@@ -41,50 +41,32 @@ class TripService extends GetConnect {
       
       if (response.statusCode == 200) {
         _handleSuccessResponse(response.body);
-        print('Trips loaded: ${trips.length}'); // Debug log
       } else if (response.statusCode == 401) {
-        // Try to refresh token
         final refreshed = await refreshToken();
         if (refreshed) {
-          // Retry the request with new token
           await getTrips(context);
         } else {
           _handleAuthError(context);
         }
       } else {
         final errorMsg = extractErrorMessage(response);
-        print('API Error: $errorMsg'); // Debug log
         toastService.showError(context: context, message: errorMsg);
       }
-    } catch (e, stackTrace) {
-      print('Exception in getTrips: $e'); // Debug log
-      print('Stack trace: $stackTrace'); // Debug log
+    } catch (e) {
       toastService.showError(context: context, message: "Network error: $e");
     }
   }
 
   void _handleSuccessResponse(dynamic responseBody) {
     if (responseBody == null) {
-      print('Response body is null'); // Debug log
       trips = [];
       return;
     }
-    
-    try {
-      print('Processing response body: ${responseBody.runtimeType}'); // Debug log
-      
+    try {      
       if (responseBody is Map<String, dynamic>) {
-        print('Response keys: ${responseBody.keys.toList()}'); // Debug log
-        
-        // Check if it's a success response
         if (responseBody.containsKey('success')) {
           if (responseBody['success'] == true) {
-            // Look for trips data in various possible keys
-            dynamic tripsData = responseBody['trips'] ?? 
-                               responseBody['data'] ?? 
-                               responseBody['results'] ?? 
-                               responseBody['items'] ??
-                               [];
+            dynamic tripsData = responseBody['trips'] ??  responseBody['data'] ?? responseBody['results'] ??  responseBody['items'] ?? [];
             if (tripsData is List) {
               trips = tripsData;
             } else {

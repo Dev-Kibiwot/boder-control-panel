@@ -1,7 +1,7 @@
-import 'package:boder/constants/utils/errors_widget.dart';
-import 'package:boder/models/privillage_user.dart';
-import 'package:boder/services/privilage_user_service.dart';
-import 'package:boder/services/toast_service.dart';
+import 'package:devboder/constants/utils/errors_widget.dart';
+import 'package:devboder/models/privillage_user.dart';
+import 'package:devboder/services/privilage_user_service.dart';
+import 'package:devboder/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

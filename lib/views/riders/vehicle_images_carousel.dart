@@ -1,8 +1,8 @@
-import 'package:boder/controller/riders_controller.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/controller/riders_controller.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

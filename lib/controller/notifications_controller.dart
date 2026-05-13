@@ -1,9 +1,9 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/controller/riders_controller.dart';
-import 'package:boder/services/notification_service.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/views/notification/notification_model.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/controller/riders_controller.dart';
+import 'package:devboder/services/notification_service.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/views/notification/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -119,11 +119,8 @@ class NotificationsController extends GetxController {
     }
     selectedRiderIds.refresh();
   }
-
-  // FIX: Don't use .toList() when adding to the list
   void selectAllUsers() {
     selectedUserIds.clear();
-    // Map returns an Iterable, which addAll accepts directly
     selectedUserIds.addAll(
       filteredUsers.map((u) => u.userId as String)
     );
@@ -135,10 +132,8 @@ class NotificationsController extends GetxController {
     selectedUserIds.refresh();
   }
 
-  // FIX: Don't use .toList() when adding to the list
   void selectAllRiders() {
     selectedRiderIds.clear();
-    // Map returns an Iterable, which addAll accepts directly
     selectedRiderIds.addAll(
       filteredRiders.map((r) => r.id as String)
     );

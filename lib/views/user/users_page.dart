@@ -1,11 +1,11 @@
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/models/users_model.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/table/custom_data_table.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/models/users_model.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/table/custom_data_table.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -39,6 +39,7 @@ class UsersPage extends StatelessWidget {
                             columns: buildTableColumns(context),
                             data: usersController.filteredUsers.map((user) => user.toMap()).toList(),
                             onSearch: usersController.searchUsers,
+                            actionBar: buildActionBar(context),
                             searchHint: 'Search users by name, email, phone...',
                             isLoading: usersController.isLoading.value,
                             noDataMessage: 'No users found',
@@ -301,5 +302,47 @@ class UsersPage extends StatelessWidget {
         },
       ),
     ];
+  }
+  Widget buildActionBar(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.blue.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.people,
+                size: 16,
+                color: AppColors.blue,
+              ),
+              const SizedBox(width: 6),
+              Obx(() => CustomText(
+                'Total: ${usersController.filteredUsers.length}',
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                textColor: AppColors.blue,
+              )),
+            ],
+          ),
+        ),
+        Spacer(),
+        ElevatedButton.icon(
+          onPressed: () => usersController.refreshUsers(context),
+          icon: const Icon(Icons.refresh, size: 16),
+          label: const Text('Refresh', style: TextStyle(fontSize: 12)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.blue,
+            foregroundColor: AppColors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            minimumSize: const Size(0, 40),
+          ),
+        ),
+      ],
+    );
   }
 }

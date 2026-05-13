@@ -1,7 +1,7 @@
-import 'package:boder/widgets/space.dart';
+import 'package:devboder/widgets/space.dart';
 import 'package:flutter/material.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/text.dart';
 
 class AppButton extends StatelessWidget {
   final String label;

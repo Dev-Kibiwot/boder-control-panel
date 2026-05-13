@@ -1,8 +1,8 @@
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/services/payment_service.dart';
-import 'package:boder/services/wallets_service.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/views/wallets/wallet_helpers.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/services/payment_service.dart';
+import 'package:devboder/services/wallets_service.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/views/wallets/wallet_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

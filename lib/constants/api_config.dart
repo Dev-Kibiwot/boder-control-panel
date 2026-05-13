@@ -2,10 +2,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiConfig {
   static final String baseUrl = dotenv.env['BASE_URL'] ?? '';
-  
   // Auth
   static String get adminLogin => '$baseUrl/auth/admin/login';
-  
   // Users
   static String get users => '$baseUrl/admin/users';
   static String deleteUser({String? userId, String? riderId}) {
@@ -48,8 +46,8 @@ class ApiConfig {
 
   // Notifications
   static String get sendToAllRegistered => '$baseUrl/admin/send-to-all-registered';
-  static String get sendToUsers => '$baseUrl/admin/send-to-users';
-  static String get sendToRiders => '$baseUrl/admin/send-to-riders';
+  static String get sendToUsers => '$baseUrl/admin/send-to-all-users';
+  static String get sendToRiders => '$baseUrl/admin/send-to-all-riders';
   static String get sendToSpecificUser => '$baseUrl/admin/send-to-user';
   static String get sendToSpecificRider => '$baseUrl/admin/send-to-rider';
   static String get notificationHistory => '$baseUrl/admin/notifications/history';

@@ -1,14 +1,14 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/dashboard_controller.dart';
-import 'package:boder/controller/riders_controller.dart';
-import 'package:boder/controller/trip_controller.dart';
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/controller/wallets_controller.dart';
-import 'package:boder/models/wallet_model.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/views/report/export_service.dart';
-import 'package:boder/views/report/report_detail_dialog.dart';
-import 'package:boder/views/report/report_item.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/dashboard_controller.dart';
+import 'package:devboder/controller/riders_controller.dart';
+import 'package:devboder/controller/trip_controller.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/controller/wallets_controller.dart';
+import 'package:devboder/models/wallet_model.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/views/report/export_service.dart';
+import 'package:devboder/views/report/report_detail_dialog.dart';
+import 'package:devboder/views/report/report_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

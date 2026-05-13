@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:boder/constants/api_config.dart';
-import 'package:boder/views/notification/notification_model.dart';
+import 'package:devboder/constants/api_config.dart';
+import 'package:devboder/views/notification/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
@@ -137,7 +137,7 @@ class NotificationService {
   Future<bool> sendToSpecificUser({
     required String title,
     required String message,
-    required String userId,
+    required String token,
     required BuildContext context,
   }) async {
     try {
@@ -146,10 +146,10 @@ class NotificationService {
       final body = jsonEncode({
         'title': title,
         'message': message,
-        'userId': userId,
+        'token': token,
       });
 
-      print('📤 Sending notification to user: $userId');
+      print('📤 Sending notification to user: $token');
       print('URL: $url');
 
       final response = await http.post(

@@ -1,13 +1,13 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/trip_controller.dart';
-import 'package:boder/models/trip_model.dart';
-import 'package:boder/views/trips/trip_details.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/table/custom_data_table.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/trip_controller.dart';
+import 'package:devboder/models/trip_model.dart';
+import 'package:devboder/views/trips/trip_details.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/table/custom_data_table.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 class TripsPage extends StatelessWidget {
@@ -41,7 +41,7 @@ class TripsPage extends StatelessWidget {
                             },
                             onSearch: tripsController.searchTrips,
                             searchHint: 'Search riders by name, email, phone, or city...',
-                            actionBar: buildFilterBar(),
+                            actionBar: buildFilterBar(context),
                             isLoading: tripsController.isLoading.value,
                             noDataMessage: 'No trips found come back later',
                           ),
@@ -153,10 +153,9 @@ class TripsPage extends StatelessWidget {
     );
   }
 
- Widget buildFilterBar() {
+ Widget buildFilterBar(BuildContext context) {
   return Obx(() => Row(
     children: [
-      // Status Filter
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -230,10 +229,7 @@ class TripsPage extends StatelessWidget {
           ],
         ),
       ),
-      
       const SizedBox(width: 12),
-      
-      // Vehicle Type Filter
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
@@ -294,8 +290,18 @@ class TripsPage extends StatelessWidget {
           ],
         ),
       ),
-      
-      // Results Counter
+      Spacer(),
+      ElevatedButton.icon(
+        onPressed: () => tripsController.refreshTrips(context),
+        icon: const Icon(Icons.refresh, size: 16),
+        label: const Text('Refresh', style: TextStyle(fontSize: 12)),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue,
+          foregroundColor: AppColors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          minimumSize: const Size(0, 40),
+        ),
+      ),
       if (tripsController.selectedStatus.value != TripStatus.all ||
           tripsController.selectedVehicleType.value != VehecleType.all)
         Padding(

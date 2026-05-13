@@ -1,13 +1,13 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/wallets_controller.dart';
-import 'package:boder/models/wallet_model.dart';
-import 'package:boder/views/wallets/wallet_details_page.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/table/custom_data_table.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
-import 'package:boder/widgets/text.dart';
-import 'package:boder/widgets/wallets_ui_utils.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/wallets_controller.dart';
+import 'package:devboder/models/wallet_model.dart';
+import 'package:devboder/views/wallets/wallet_details_page.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/table/custom_data_table.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
+import 'package:devboder/widgets/text.dart';
+import 'package:devboder/widgets/wallets_ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -365,10 +365,8 @@ class WalletsPage extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        
-        const Spacer(),
-        
+          ),        
+        const Spacer(),        
         // Refresh Button
         ElevatedButton.icon(
           onPressed: () => controller.refreshAll(Get.context!),

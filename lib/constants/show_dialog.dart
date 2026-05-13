@@ -1,5 +1,5 @@
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

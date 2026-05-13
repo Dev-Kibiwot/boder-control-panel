@@ -1,7 +1,7 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/models/trip_model.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/services/trip_service.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/models/trip_model.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/services/trip_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

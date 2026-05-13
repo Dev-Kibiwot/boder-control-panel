@@ -1,9 +1,8 @@
-import 'package:boder/constants/show_dialog.dart';
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/services/riders_services.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/views/riders/vehicle_images_carousel.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/services/riders_services.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/views/riders/vehicle_images_carousel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,21 +13,31 @@ class RidersController extends GetxController {
   final PageController dialogCarouselController = PageController();
   final dialogCurrentIndex = 0.obs;
   final RxList<Rider> _allRiders = <Rider>[].obs;
-  final RxList<Rider> filteredRiders = <Rider>[].obs;
+  // _filteredRiders holds all results after search/filter; pagedRiders is the current page slice
+  final RxList<Rider> _filteredRiders = <Rider>[].obs;
+  final RxList<Rider> filteredRiders = <Rider>[].obs; // current page slice shown in table
   final RxString searchQuery = ''.obs;
   final Rx<ApprovalFilter> selectedFilter = ApprovalFilter.all.obs;
   final Rx<VehecleType> selectedvehecle = VehecleType.all.obs;
   final RxBool isLoading = false.obs;
-  final RxBool isActionLoading = false.obs; 
+  final RxBool isActionLoading = false.obs;
   final Rxn<Rider> selectedRider = Rxn<Rider>();
+
+  // Pagination state
+  final RxInt currentPage = 1.obs;
+  final RxInt pageSize = 20.obs;
+  final List<int> pageSizeOptions = [10, 20, 50, 100];
+
+  int get totalFilteredCount => _filteredRiders.length;
+  int get totalPages => (totalFilteredCount / pageSize.value).ceil().clamp(1, 999999);
 
   Future<void> fetchRiders(BuildContext context) async {
     try {
       isLoading.value = true;
       await ridersService.getRiders(context);
-      final List<Rider> fetchedRiders =(ridersService.riders).map((r) => Rider.fromMap(r)).toList();
+      final List<Rider> fetchedRiders = (ridersService.riders).map((r) => Rider.fromMap(r)).toList();
       _allRiders.assignAll(fetchedRiders);
-      filteredRiders.assignAll(fetchedRiders);
+      _applyFilters();
     } catch (e) {
       return;
     } finally {
@@ -38,18 +47,33 @@ class RidersController extends GetxController {
 
   void searchRiders(String query) {
     searchQuery.value = query;
+    currentPage.value = 1;
     _applyFilters();
   }
 
   void filterByApproval(ApprovalFilter filter) {
     selectedFilter.value = filter;
+    currentPage.value = 1;
     _applyFilters();
   }
 
   void filterByType(VehecleType filter) {
-      selectedvehecle.value = filter;
-      _applyFilters();
-    }
+    selectedvehecle.value = filter;
+    currentPage.value = 1;
+    _applyFilters();
+  }
+
+  void goToPage(int page) {
+    if (page < 1 || page > totalPages) return;
+    currentPage.value = page;
+    _updatePageSlice();
+  }
+
+  void changePageSize(int size) {
+    pageSize.value = size;
+    currentPage.value = 1;
+    _updatePageSlice();
+  }
 
   void _applyFilters() {
     final filtered = _allRiders.where((rider) {
@@ -66,7 +90,20 @@ class RidersController extends GetxController {
           (selectedvehecle.value == VehecleType.petroleum && rider.vehicleCategory == 'petroleum');
       return matchesSearch && matchesFilter && matchesVehicleType;
     }).toList();
-    filteredRiders.assignAll(filtered);
+    _filteredRiders.assignAll(filtered);
+    _updatePageSlice();
+  }
+
+  void _updatePageSlice() {
+    final start = (currentPage.value - 1) * pageSize.value;
+    final end = (start + pageSize.value).clamp(0, _filteredRiders.length);
+    if (start >= _filteredRiders.length) {
+      currentPage.value = totalPages;
+      final s = ((currentPage.value - 1) * pageSize.value).clamp(0, _filteredRiders.length);
+      filteredRiders.assignAll(_filteredRiders.sublist(s, _filteredRiders.length));
+    } else {
+      filteredRiders.assignAll(_filteredRiders.sublist(start, end));
+    }
   }
 
   void clearSelection() {
@@ -134,14 +171,11 @@ class RidersController extends GetxController {
     try {
       isActionLoading.value = true; 
       print('🔍 Controller deleteUser called for rider:');
-      
       final success = await ridersService.deleteUser(
         riderId: rider.id,
         context: context,
       );
-      
       print('   Delete result: $success');
-      
       if (success) {
         print('   ✅ Delete successful, updating local lists');
         _allRiders.removeWhere((r) => r.id == rider.id);
@@ -153,13 +187,25 @@ class RidersController extends GetxController {
           context: context,
           message: "${rider.fullnames} deleted successfully",
         );
-      } else {
-        print('   ❌ Delete failed');
       }
     } catch (e) {
       print('   ❌ Exception in deleteUser: $e');
     } finally {
       isActionLoading.value = false; 
+    }
+  }
+ 
+  Future<void> refreshRiders(BuildContext context) async {
+    try {
+      isLoading.value = true;
+      await fetchRiders(context); 
+    } catch (e) {
+      toastService.showError(
+        context: context,
+        message: 'Failed to reload data: ${e.toString()}'
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
   void showVehicleImagesDialog(Rider rider) {

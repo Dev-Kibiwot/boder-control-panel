@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/models/users_model.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/models/users_model.dart';
 
 class Trip {
   final String id;

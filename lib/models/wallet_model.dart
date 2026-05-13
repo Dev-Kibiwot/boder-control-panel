@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/models/users_model.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/models/users_model.dart';
 
 Wallets walletsFromJson(String str) => Wallets.fromJson(json.decode(str));
 String walletsToJson(Wallets data) => json.encode(data.toJson());

@@ -1,10 +1,10 @@
-import 'package:boder/controller/privillage_user_controller.dart';
-import 'package:boder/models/privillage_user.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/table/custom_data_table.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/controller/privillage_user_controller.dart';
+import 'package:devboder/models/privillage_user.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/table/custom_data_table.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

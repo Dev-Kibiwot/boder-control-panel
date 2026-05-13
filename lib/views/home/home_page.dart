@@ -1,14 +1,14 @@
-import 'package:boder/controller/side_nav_controller.dart';
-import 'package:boder/controller/dashboard_controller.dart';
-import 'package:boder/controller/wallets_controller.dart';
-import 'package:boder/widgets/charts/completed_vs_cancelled_chart.dart';
-import 'package:boder/widgets/charts/new_users_chart.dart';
-import 'package:boder/widgets/charts/traffic_pattern_chart.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/spacing.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/controller/side_nav_controller.dart';
+import 'package:devboder/controller/dashboard_controller.dart';
+import 'package:devboder/controller/wallets_controller.dart';
+import 'package:devboder/widgets/charts/completed_vs_cancelled_chart.dart';
+import 'package:devboder/widgets/charts/new_users_chart.dart';
+import 'package:devboder/widgets/charts/traffic_pattern_chart.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/spacing.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,8 +1,8 @@
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/models/users_model.dart';
-import 'package:boder/services/auth_service.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/constants/utils/errors_widget.dart';
+import 'package:devboder/constants/utils/errors_widget.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/models/users_model.dart';
+import 'package:devboder/services/auth_service.dart';
+import 'package:devboder/services/toast_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 

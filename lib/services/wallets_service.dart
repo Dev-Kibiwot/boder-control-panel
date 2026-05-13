@@ -1,8 +1,8 @@
-import 'package:boder/models/wallet_model.dart';
-import 'package:boder/constants/api_config.dart';
-import 'package:boder/constants/utils/enums.dart'; // Add this
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/constants/utils/errors_widget.dart';
+import 'package:devboder/models/wallet_model.dart';
+import 'package:devboder/constants/api_config.dart';
+import 'package:devboder/constants/utils/enums.dart'; 
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/constants/utils/errors_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
@@ -16,21 +16,18 @@ class WalletsService extends GetConnect {
   Future<Wallets?> getWallets(BuildContext context, {BalanceFilter? balanceFilter}) async {
     final token = storage.read('token');
     try {
-      // Build query parameters
       String url = ApiConfig.wallets;
       if (balanceFilter != null && balanceFilter != BalanceFilter.all) {
         final filterParam = _getBalanceFilterParam(balanceFilter);
         url = '$url?balanceFilter=$filterParam';
-      }
-      
+      }      
       final response = await get(
         url,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-      );
-      
+      );      
       if (response.statusCode == 200) {
         if (response.body != null) {
           walletsResponse = Wallets.fromJson(response.body);
@@ -113,7 +110,6 @@ class WalletsService extends GetConnect {
     }
   }
   
-  // Rest of the methods remain the same...
   Future<Map<String, dynamic>?> payRiders(BuildContext context, {
     String? riderId,
     double? amount,

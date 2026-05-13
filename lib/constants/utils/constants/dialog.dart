@@ -3,7 +3,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:boder/widgets/space.dart';
+import 'package:devboder/widgets/space.dart';
 
 void showLoadingDialog(BuildContext context) {
   Get.dialog(

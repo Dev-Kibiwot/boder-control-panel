@@ -1,12 +1,12 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/riders_controller.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/views/riders/rider_details.dart'; // RiderDetailsDialog
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/table/custom_data_table.dart';
-import 'package:boder/widgets/custom_header.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
-import 'package:boder/widgets/text.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/riders_controller.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/views/riders/rider_details.dart'; // RiderDetailsDialog
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/table/custom_data_table.dart';
+import 'package:devboder/widgets/custom_header.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
+import 'package:devboder/widgets/text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -32,7 +32,7 @@ class RidersPage extends StatelessWidget {
                       child: CustomDataTable<Map<String, dynamic>>(
                         tag: 'riders_table',
                         columns: buildTableColumns(),
-                        data:ridersController.filteredRiders.toMapList(),
+                        data: ridersController.filteredRiders.toMapList(),
                         onRowTap: (riderMap) {
                           final rider = Rider.fromMap(riderMap);
                           ridersController.selectedRider.value = rider;
@@ -42,11 +42,19 @@ class RidersPage extends StatelessWidget {
                             barrierColor: Colors.black.withOpacity(0.4),
                           );
                         },
-                        onSearch:ridersController.searchRiders,
-                        searchHint:'Search riders by name, email, phone, or city...',
-                        actionBar: buildFilterBar(),
-                        isLoading:ridersController.isLoading.value,
+                        onSearch: ridersController.searchRiders,
+                        searchHint: 'Search riders by name, email, phone, or city...',
+                        actionBar: buildFilterBar(context),
+                        isLoading: ridersController.isLoading.value,
                         noDataMessage: 'No riders found',
+                        showPagination: true,
+                        currentPage: ridersController.currentPage.value,
+                        totalPages: ridersController.totalPages,
+                        pageSize: ridersController.pageSize.value,
+                        pageSizeOptions: ridersController.pageSizeOptions,
+                        totalCount: ridersController.totalFilteredCount,
+                        onPageChange: ridersController.goToPage,
+                        onPageSizeChange: ridersController.changePageSize,
                       ),
                     ),
                   ],
@@ -148,7 +156,7 @@ class RidersPage extends StatelessWidget {
       ),
     );
   }
-  Widget buildFilterBar() {
+  Widget buildFilterBar(BuildContext context) {
     return Obx(
       () => Row(
         children: [
@@ -191,8 +199,7 @@ class RidersPage extends StatelessWidget {
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<ApprovalFilter>(
-                      value: ridersController
-                          .selectedFilter.value,
+                      value: ridersController.selectedFilter.value,
                       isDense: true,
                       menuMaxHeight: 200,
                       style: const TextStyle(
@@ -331,13 +338,25 @@ class RidersPage extends StatelessWidget {
                       BorderRadius.circular(20),
                 ),
                 child: CustomText(
-                  '${ridersController.filteredRiders.length}',
+                  '${ridersController.totalFilteredCount}',
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   textColor: AppColors.blue,
                 ),
               ),
             ),
+            Spacer(),
+            ElevatedButton.icon(
+            onPressed: () => ridersController.refreshRiders(context),
+            icon: const Icon(Icons.refresh, size: 16),
+            label: const Text('Refresh', style: TextStyle(fontSize: 12)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.blue,
+              foregroundColor: AppColors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              minimumSize: const Size(0, 40),
+            ),
+          ),
         ],
       ),
     );

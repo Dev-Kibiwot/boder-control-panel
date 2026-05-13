@@ -1,11 +1,11 @@
-import 'package:boder/services/toast_service.dart';
+import 'package:devboder/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/constants/utils/colors.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/constants/utils/colors.dart';
 
 class WalletHelpers {
   static Future<bool?> showPaymentConfirmationDialog({

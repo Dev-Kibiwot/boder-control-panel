@@ -1,6 +1,6 @@
 #define AppName "Boder"
 #define AppVersion "1.0.0"
-#define AppExeName "boder.exe"
+#define AppExeName "devboder.exe"
 
 [Setup]
 AppId={{2C2B2C3F-7A7B-4D2E-A5A1-123456789ABC}}   ; generate your own GUID
@@ -21,10 +21,10 @@ SetupIconFile=windows\runner\resources\app_icon.ico
 Source: "build\windows\x64\runner\Release\*"; DestDir: "{app}";
 Flags: recursesubdirs createallsubdirs ignoreversion
 
-; Optional: include VC++ redistributable if you want to be safe
-; Put the file at vendor\VC_redist.x64.exe
-Source: "vendor\VC_redist.x64.exe"; DestDir: "{tmp}";
-Flags: deleteafterinstall; Check: not VCInstalled
+; Optional: include VC++ redistributable - download VC_redist.x64.exe from Microsoft
+; and place it in a vendor\ folder, then uncomment the lines below:
+; Source: "vendor\VC_redist.x64.exe"; DestDir: "{tmp}";
+; Flags: deleteafterinstall; Check: not VCInstalled
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -35,7 +35,7 @@ Name: "desktopicon"; Description: "Create a &desktop icon"; Flags: unchecked
 
 [Run]
 ; Optional: install VC++ redist quietly if missing
-Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /quiet /norestart"; Check: not VCInstalled
+; Filename: "{tmp}\VC_redist.x64.exe"; Parameters: "/install /quiet /norestart"; Check: not VCInstalled
 ; Launch app after install
 Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
 

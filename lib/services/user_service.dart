@@ -1,6 +1,6 @@
-import 'package:boder/constants/utils/errors_widget.dart';
-import 'package:boder/constants/api_config.dart';
-import 'package:boder/services/toast_service.dart';
+import 'package:devboder/constants/utils/errors_widget.dart';
+import 'package:devboder/constants/api_config.dart';
+import 'package:devboder/services/toast_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:get/get.dart';
@@ -41,16 +41,8 @@ class UserService extends GetConnect {
   }
   Future<bool> deleteUser(String userId, BuildContext context) async {
   final token = storage.read('token');
-  // Debug logging
-  print('🔍 Delete User Debug:');
-  print('   userId: $userId');
-  print('   token exists: ${token != null}');
-  
   try {
-    // Build URL and log it
     final url = ApiConfig.deleteUser(userId: userId);
-    print('   URL: $url');
-    
     final response = await delete(
       url,
       headers: {
@@ -58,10 +50,6 @@ class UserService extends GetConnect {
         'Content-Type': 'application/json',
       },
     );
-
-    print('   Response Status: ${response.statusCode}');
-    print('   Response Body: ${response.body}');
-
     if (response.statusCode == 200 || response.statusCode == 204) {
       return true;
     } else if (response.statusCode == 401) {
@@ -74,7 +62,6 @@ class UserService extends GetConnect {
       Get.offAllNamed('/');
       return false;
     } else if (response.statusCode == 404) {
-      print('   404 Error Details: User not found with userId: $userId');
       toastService.showError(
         context: context,
         message: "User not found. The user may have already been deleted or the ID is incorrect.",
@@ -87,7 +74,6 @@ class UserService extends GetConnect {
       );
       return false;
     } else {
-      print('   Unexpected status code: ${response.statusCode}');
       final errorMessage = extractErrorMessage(response);
       toastService.showError(context: context, message: errorMessage);
       return false;

@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:boder/constants/layout/main_layout.dart';
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/views/auth/login_screen.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/custom_annotated_sheet.dart';
+import 'package:devboder/constants/layout/main_layout.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/views/auth/login_screen.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/custom_annotated_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';

@@ -1,6 +1,6 @@
-import 'package:boder/controller/table_controller.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/table/table_colunm.dart';
+import 'package:devboder/controller/table_controller.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/table/table_colunm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:get/get_state_manager/src/simple/get_state.dart';
@@ -19,6 +19,14 @@ class CustomDataTable<T extends Map<String, dynamic>> extends StatelessWidget {
   final String noDataMessage;
   final String? tag;
   final bool showSearchBar;
+  final bool showPagination;
+  final int? currentPage;
+  final int? totalPages;
+  final int? pageSize;
+  final List<int>? pageSizeOptions;
+  final Function(int page)? onPageChange;
+  final Function(int size)? onPageSizeChange;
+  final int? totalCount;
 
   const CustomDataTable({
     super.key,
@@ -35,6 +43,14 @@ class CustomDataTable<T extends Map<String, dynamic>> extends StatelessWidget {
     this.noDataMessage = 'No data available',
     this.tag,
     this.showSearchBar = true,
+    this.showPagination = false,
+    this.currentPage,
+    this.totalPages,
+    this.pageSize,
+    this.pageSizeOptions,
+    this.onPageChange,
+    this.onPageSizeChange,
+    this.totalCount,
   });
 
   @override
@@ -49,6 +65,8 @@ class CustomDataTable<T extends Map<String, dynamic>> extends StatelessWidget {
           Expanded(
             child: buildContent(controller)
           ),
+          if (showPagination && !isLoading && data.isNotEmpty)
+            buildPaginationBar(),
         ],
       ),
     );
@@ -216,6 +234,181 @@ class CustomDataTable<T extends Map<String, dynamic>> extends StatelessWidget {
               ),
             ),
           )).toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget buildPaginationBar() {
+    final page = currentPage ?? 1;
+    final pages = totalPages ?? 1;
+    final size = pageSize ?? 20;
+    final total = totalCount ?? data.length;
+    final sizeOpts = pageSizeOptions ?? [10, 20, 50, 100];
+
+    final startItem = total == 0 ? 0 : (page - 1) * size + 1;
+    final endItem = (page * size).clamp(0, total);
+
+    // Build visible page numbers (show up to 5 around current page)
+    List<int> visiblePages = [];
+    if (pages <= 7) {
+      visiblePages = List.generate(pages, (i) => i + 1);
+    } else {
+      visiblePages = [1];
+      if (page > 3) visiblePages.add(-1); // ellipsis
+      for (int i = (page - 1).clamp(2, pages - 1); i <= (page + 1).clamp(2, pages - 1); i++) {
+        visiblePages.add(i);
+      }
+      if (page < pages - 2) visiblePages.add(-1); // ellipsis
+      visiblePages.add(pages);
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(top: BorderSide(color: AppColors.borderColor)),
+      ),
+      child: Row(
+        children: [
+          // Page size selector
+          Row(
+            children: [
+              const Text(
+                'Rows per page:',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                height: 32,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  border: Border.all(color: AppColors.borderColor),
+                  borderRadius: BorderRadius.circular(6),
+                  color: AppColors.cardBackground,
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    value: sizeOpts.contains(size) ? size : sizeOpts.first,
+                    isDense: true,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    items: sizeOpts.map((s) => DropdownMenuItem(
+                      value: s,
+                      child: Text('$s'),
+                    )).toList(),
+                    onChanged: (val) {
+                      if (val != null) onPageSizeChange?.call(val);
+                    },
+                    icon: const Icon(Icons.arrow_drop_down, size: 18),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 24),
+          // Item range info
+          Text(
+            '$startItem–$endItem of $total',
+            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+          const Spacer(),
+          // Page navigation
+          Row(
+            children: [
+              // First page
+              _pageNavButton(
+                icon: Icons.first_page,
+                enabled: page > 1,
+                onTap: () => onPageChange?.call(1),
+              ),
+              const SizedBox(width: 4),
+              // Previous page
+              _pageNavButton(
+                icon: Icons.chevron_left,
+                enabled: page > 1,
+                onTap: () => onPageChange?.call(page - 1),
+              ),
+              const SizedBox(width: 8),
+              // Page number buttons
+              ...visiblePages.map((p) {
+                if (p == -1) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('...', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                  );
+                }
+                final isActive = p == page;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: InkWell(
+                    onTap: isActive ? null : () => onPageChange?.call(p),
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: isActive ? AppColors.blue : Colors.transparent,
+                        borderRadius: BorderRadius.circular(6),
+                        border: isActive ? null : Border.all(color: AppColors.borderColor),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$p',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isActive ? AppColors.white : AppColors.primaryBlue,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(width: 8),
+              // Next page
+              _pageNavButton(
+                icon: Icons.chevron_right,
+                enabled: page < pages,
+                onTap: () => onPageChange?.call(page + 1),
+              ),
+              const SizedBox(width: 4),
+              // Last page
+              _pageNavButton(
+                icon: Icons.last_page,
+                enabled: page < pages,
+                onTap: () => onPageChange?.call(pages),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pageNavButton({
+    required IconData icon,
+    required bool enabled,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: enabled ? onTap : null,
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: enabled ? AppColors.borderColor : AppColors.borderColor.withOpacity(0.4)),
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          icon,
+          size: 18,
+          color: enabled ? AppColors.primaryBlue : AppColors.lightGrey,
         ),
       ),
     );

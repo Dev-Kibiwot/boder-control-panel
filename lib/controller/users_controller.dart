@@ -1,7 +1,7 @@
-import 'package:boder/constants/show_dialog.dart';
-import 'package:boder/models/users_model.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/services/user_service.dart';
+import 'package:devboder/constants/show_dialog.dart';
+import 'package:devboder/models/users_model.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/services/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -110,6 +110,19 @@ class UsersController extends GetxController {
     _applyFilters();
   }
 
+  Future<void> refreshUsers(BuildContext context) async {
+    try {
+      isLoading.value = true;
+      await fetchUsers(context); 
+    } catch (e) {
+      toastService.showError(
+        context: context,
+        message: 'Failed to reload data: ${e.toString()}'
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
   int get totalUsers => allUsers.length;
   int get filteredUsersCount => filteredUsers.length;
 }

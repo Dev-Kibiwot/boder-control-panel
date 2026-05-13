@@ -1,12 +1,12 @@
-import 'package:boder/models/wallet_model.dart';
-import 'package:boder/models/riders_model.dart';
-import 'package:boder/models/users_model.dart';
-import 'package:boder/controller/riders_controller.dart';
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/controller/payment_controller.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/services/wallets_service.dart';
-import 'package:boder/constants/utils/enums.dart';
+import 'package:devboder/models/wallet_model.dart';
+import 'package:devboder/models/riders_model.dart';
+import 'package:devboder/models/users_model.dart';
+import 'package:devboder/controller/riders_controller.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/controller/payment_controller.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/services/wallets_service.dart';
+import 'package:devboder/constants/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,10 +1,10 @@
-import 'package:boder/controller/wallets_controller.dart';
-import 'package:boder/models/wallet_model.dart';
-import 'package:boder/services/toast_service.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/widgets/space.dart';
-import 'package:boder/widgets/text.dart';
-import 'package:boder/widgets/text_form_field.dart';
+import 'package:devboder/controller/wallets_controller.dart';
+import 'package:devboder/models/wallet_model.dart';
+import 'package:devboder/services/toast_service.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/widgets/space.dart';
+import 'package:devboder/widgets/text.dart';
+import 'package:devboder/widgets/text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

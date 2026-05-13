@@ -1,7 +1,7 @@
-import 'package:boder/constants/utils/enums.dart';
-import 'package:boder/controller/notifications_controller.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/views/notification/notification_model.dart';
+import 'package:devboder/constants/utils/enums.dart';
+import 'package:devboder/controller/notifications_controller.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/views/notification/notification_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

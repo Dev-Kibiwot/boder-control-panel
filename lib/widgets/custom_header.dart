@@ -1,10 +1,10 @@
-import 'package:boder/controller/auth_controller.dart';
-import 'package:boder/controller/users_controller.dart';
-import 'package:boder/constants/utils/colors.dart';
-import 'package:boder/views/notification/send_notification_dialog.dart';
-import 'package:boder/widgets/spacing.dart';
-import 'package:boder/widgets/text.dart';
-import 'package:boder/widgets/wallets_ui_utils.dart';
+import 'package:devboder/controller/auth_controller.dart';
+import 'package:devboder/controller/users_controller.dart';
+import 'package:devboder/constants/utils/colors.dart';
+import 'package:devboder/views/notification/send_notification_dialog.dart';
+import 'package:devboder/widgets/spacing.dart';
+import 'package:devboder/widgets/text.dart';
+import 'package:devboder/widgets/wallets_ui_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
